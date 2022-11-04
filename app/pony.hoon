@@ -1,4 +1,4 @@
-/-  pony
+/-  *pony
 /+  dbug, default-agent, server, schooner
 /*  pony-ui  %html  /app/pony-ui/html
 |%
@@ -12,9 +12,11 @@
 ^-  agent:gall
 =|  state-0
 =*  state  -
+=<
 |_  =bowl:gall
 +*  this  .
     def  ~(. (default-agent this %.n) bowl)
+    hc    ~(. +> bowl)
 ++  on-init
   ^-  (quip card _this)
   :_  this
@@ -42,7 +44,7 @@
   |^
   ?+    mark  (on-poke:def mark vase)
       %pony-action
-    =/  action  !<(action:pony vase)
+    =/  action  !<(action vase)
     =^  cards  state
       (handle-action action)
     [cards this]
@@ -53,19 +55,19 @@
     ::[cards this]
   ==
   ++  handle-action
-    |=  =action:pony
+    |=  =action
     ^-  (quip card _state)
     ?-    -.action
     ::
     ::  Update state with new thread and invite participants
-    ::    %new-thread
-    ::  ?>  =(src.bowl our.bowl)
-    ::  ::(create-thread +.action)
-    ::  =.(threads (into threads 0 (create-thread +.action)))
-    ::  `state
-    ::  
-        %delete-page
-      `state(pages (~(del by pages) url:action))
+        %new-thread
+      ?>  =(src.bowl our.bowl)
+      `state(threads (into threads 0 (create-thread:hc +.action)))
+    ::  invite cards here
+    ::
+    ::  Duplicate thread and invite new participants
+    ::    %fork-thread
+    ::  `state(pages (~(del by pages) url:action))
     ==
   --
 ++  on-peek  on-peek:def
@@ -81,4 +83,24 @@
 ++  on-agent  on-agent:def
 ++  on-arvo  on-arvo:def
 ++  on-fail  on-fail:def
+--
+::
+|_  bowl:gall
+++  create-thread
+  |=  [=message =participants =voyeurs]
+  ^-  thread
+  :*  now
+      our
+      ~[message]
+      participants
+      voyeurs
+  ==
+::
+++  find-thread
+  |=  =id
+  ^-  thread
+  %+  snag  0
+  %+  skim  threads
+  |=  t=thread
+  =(-.t id)
 --
