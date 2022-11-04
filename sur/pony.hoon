@@ -13,7 +13,7 @@
 +$  action
   $%  [%new-thread title=@t =message =participants =voyeurs]
       [%fork-thread =id =participants =voyeurs]
-     ::[%add-ship =id =ship]
+      [%add-ship =id =ship]
      ::[%invite =id]
      ::[%new-message text=@t =id]
      ::[%post text=@p =id]

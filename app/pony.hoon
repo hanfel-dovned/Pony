@@ -59,7 +59,7 @@
     ^-  (quip card _state)
     ?-    -.action
     ::
-    ::  Update state with new thread and invite participants
+    ::  Update state with new thread and invite participants.
         %new-thread
       ?>  =(src.bowl our.bowl)
       =/  newthread  ^-  thread  
@@ -70,10 +70,10 @@
                          participants:action
                          voyeurs:action
                      ==
-      `state(threads (into threads 0 newthread))
-    ::  invite cards here
+      `state(threads (snoc threads newthread))
+      ::  invite cards here
     ::
-    ::  Duplicate thread and invite new participants
+    ::  Duplicate thread and invite new participants.
         %fork-thread
       ?>  =(src.bowl our.bowl)
       =/  oldthread  (find-thread:hc id:action)
@@ -85,7 +85,19 @@
                          participants:action
                          voyeurs:action
                      ==
-      `state(threads (into threads 0 newthread))
+      `state(threads (snoc threads newthread))
+      ::invite other ships
+    ::
+    ::  Add ship to thread, or forward poke to host.
+        %add-ship
+      =/  thethread  (find-thread:hc id:action)
+      ?:  =(host:thethread our.bowl)
+        ?>  (is-member participants:thethread src.bowl)
+        =/  newmembers  (snoc participants:thethread ship:action)
+        =.  participants:thethread:threads  newmembers
+        `state
+        ::invite other ships
+      `state
     ==
   --
 ++  on-peek  on-peek:def
@@ -111,4 +123,12 @@
   %+  skim  threads
   |=  t=thread
   =(-.t id)
+::
+++  is-member
+  |=  [members=(list @p) who=@p]
+  ^-  ?
+  ?!  ?~
+  %+  skim  members
+  |=  m=@p
+  =(m who)
 --
