@@ -1,0 +1,9 @@
+:~  title+'Pony'
+    info+'Long-form threaded conversations.'
+    color+0x13.c6fc
+    base+'pony'
+    site+/apps/pony
+    version+[0 1 0]
+    website+'https://github.com/hanfel-dovned/Pony'
+    license+'MIT'
+==
