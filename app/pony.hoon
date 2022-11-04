@@ -62,12 +62,30 @@
     ::  Update state with new thread and invite participants
         %new-thread
       ?>  =(src.bowl our.bowl)
-      `state(threads (into threads 0 (create-thread:hc +.action)))
+      =/  newthread  ^-  thread  
+                     :*  now.bowl
+                         title:action
+                         our.bowl
+                         ~[message:action]
+                         participants:action
+                         voyeurs:action
+                     ==
+      `state(threads (into threads 0 newthread))
     ::  invite cards here
     ::
     ::  Duplicate thread and invite new participants
-    ::    %fork-thread
-    ::  `state(pages (~(del by pages) url:action))
+        %fork-thread
+      ?>  =(src.bowl our.bowl)
+      =/  oldthread  (find-thread:hc id:action)
+      =/  newthread  ^-  thread
+                     :*  now.bowl
+                         title:oldthread
+                         our.bowl
+                         messages:oldthread
+                         participants:action
+                         voyeurs:action
+                     ==
+      `state(threads (into threads 0 newthread))
     ==
   --
 ++  on-peek  on-peek:def
@@ -86,16 +104,6 @@
 --
 ::
 |_  bowl:gall
-++  create-thread
-  |=  [=message =participants =voyeurs]
-  ^-  thread
-  :*  now
-      our
-      ~[message]
-      participants
-      voyeurs
-  ==
-::
 ++  find-thread
   |=  =id
   ^-  thread

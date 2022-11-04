@@ -4,14 +4,15 @@
 +$  participants  (list @p)
 +$  voyeurs  (list @p)
 +$  thread  $:  =id
+                title=@t
                 host=@p 
                 messages=(list message) 
                 =participants
                 =voyeurs
             == 
 +$  action
-  $%  [%new-thread =message =participants =voyeurs]
-     ::[%fork-thread =id =participants =voyeurs]
+  $%  [%new-thread title=@t =message =participants =voyeurs]
+      [%fork-thread =id =participants =voyeurs]
      ::[%add-ship =id =ship]
      ::[%invite =id]
      ::[%new-message text=@t =id]
