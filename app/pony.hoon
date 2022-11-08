@@ -5,7 +5,7 @@
 +$  versioned-state
   $%  state-0
   ==
-+$  state-0  [%0 threads=(list thread)]
++$  state-0  [%0 =threads]
 +$  card  card:agent:gall
 --
 %-  agent:dbug
@@ -63,41 +63,51 @@
         %new-thread
       ?>  =(src.bowl our.bowl)
       =/  newthread  ^-  thread  
-                     :*  now.bowl
-                         title:action
+                     :*  title:action
                          our.bowl
                          ~[message:action]
-                         participants:action
+                         (snoc participants:action our.bowl)
                          voyeurs:action
                      ==
-      `state(threads (snoc threads newthread))
+      `state(threads (~(put by threads) now.bowl newthread))
       ::  invite cards here
     ::
     ::  Duplicate thread and invite new participants.
         %fork-thread
       ?>  =(src.bowl our.bowl)
-      =/  oldthread  (find-thread:hc id:action)
+      =/  oldthread  ^-  thread  (~(got by threads) id:action)
       =/  newthread  ^-  thread
-                     :*  now.bowl
-                         title:oldthread
+                     :*  title:oldthread
                          our.bowl
                          messages:oldthread
-                         participants:action
+                         (snoc participants:action our.bowl)
                          voyeurs:action
                      ==
-      `state(threads (snoc threads newthread))
+      `state(threads (~(put by threads) now.bowl newthread))
       ::invite other ships
     ::
     ::  Add ship to thread, or forward poke to host.
         %add-ship
-      =/  thethread  (find-thread:hc id:action)
+      =/  thethread  ^-  thread  (~(got by threads) id:action)
       ?:  =(host:thethread our.bowl)
         ?>  (is-member participants:thethread src.bowl)
-        =/  newmembers  (snoc participants:thethread ship:action)
-        =.  participants:thethread:threads  newmembers
-        `state
+        =/  newparticipants  (snoc participants:thethread ship:action)
+        =/  newthread  ^-  thread
+                       :*  title:thethread
+                           host:thethread
+                           messages:thethread
+                           newparticipants
+                           voyeurs:thethread
+                       ==
+        `state(threads (~(put by threads) id:action newthread))
         ::invite other ships
       `state
+      :: ?>  =(our.bowl src.bowl) ::otherwise participant A could route request to host through B
+      :: run add-ship poke on host:thethread
+    ::
+    ::  Remote ships call this to add me to a thread.
+    ::    %invite
+      
     ==
   --
 ++  on-peek  on-peek:def
@@ -116,19 +126,21 @@
 --
 ::
 |_  bowl:gall
-++  find-thread
-  |=  =id
-  ^-  thread
-  %+  snag  0
-  %+  skim  threads
-  |=  t=thread
-  =(-.t id)
+::++  find-thread
+::  |=  =id
+::  ^-  thread
+::  %+  snag  0
+::  %+  skim  threads
+::  |=  t=thread
+::  =(-.t id)
 ::
 ++  is-member
   |=  [members=(list @p) who=@p]
   ^-  ?
-  ?!  ?~
-  %+  skim  members
-  |=  m=@p
-  =(m who)
+  =+  %+  skim  members
+      |=  m=@p
+      =(m who)
+  ?~  -
+    %.n
+  %.y
 --
