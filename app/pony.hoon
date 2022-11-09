@@ -86,11 +86,15 @@
       `state(threads (~(put by threads) now.bowl newthread))
       ::invite other ships
     ::
-    ::  Add ship to thread, or forward poke to host.
+    ::  If host: add ship to thread as participant.
+    ::  If participant: forward this poke to the host.
         %add-ship
-      =/  thethread  ^-  thread  (~(got by threads) id:action)
+      =/  thethread  
+          ^-  thread  
+          (~(got by threads) id:action)
       ?:  =(host:thethread our.bowl)
         ?>  (is-member participants:thethread src.bowl)
+        ?<  (is-member participants:thethread ship:action)
         =/  newparticipants  (snoc participants:thethread ship:action)
         =/  newthread  ^-  thread
                        :*  title:thethread
@@ -99,15 +103,19 @@
                            newparticipants
                            voyeurs:thethread
                        ==
-        `state(threads (~(put by threads) id:action newthread))
-        ::invite other ships
+        :_  state(threads (~(put by threads) id:action newthread))
+        :~  [%pass /invites %agent [ship:action %pony] %poke %pony-action !>([%invite id:action])]
+        ==
       `state
       :: ?>  =(our.bowl src.bowl) ::otherwise participant A could route request to host through B
       :: run add-ship poke on host:thethread
     ::
-    ::  Remote ships call this to add me to a thread.
-    ::    %invite
-      
+    ::  Remote hosts call this to add me to a thread.
+        %invite
+      ?<  (~(has by threads) id:action)
+      :_  state
+      :~  [%pass /updates/(scot %da id:action) %agent [src.bowl %pony] %watch /(scot %da id:action)]
+      ==
     ==
   --
 ++  on-peek  on-peek:def
@@ -117,10 +125,42 @@
   ?+    path  (on-watch:def path)
       [%http-response *]
     `this
+  ::
+  ::  Watch paths are the ID of the thread
+      [@ ~]
+    =/  theid  (slav %da -.path)
+    =/  thethread  
+        ^-  thread  
+        (~(got by threads) theid)
+    ?>  ?|  (is-member participants:thethread src.bowl)
+            (is-member voyeurs:thethread src.bowl)
+        ==
+    :_  this
+    :~  [%give %fact ~ %pony-update !>(`update`[%thread theid thethread])]
+    ==
   ==
 ::
 ++  on-leave  on-leave:def
-++  on-agent  on-agent:def
+++  on-agent
+  |=  [=wire =sign:agent:gall]
+  ^-  (quip card _this)
+  ?+    wire  (on-agent:def wire sign)
+      [%updates @ ~]
+    ?+    -.sign  (on-agent:def wire sign)
+        %fact
+      ?+    p.cage.sign  (on-agent:def wire sign)
+          %pony-update
+        =/  newupdate  !<(update q.cage.sign)
+        ?-    -.newupdate
+            %thread
+          ?>  =(id:newupdate (slav %da +6:wire))
+          `this(threads (~(put by threads) id:newupdate thread:newupdate))
+        ==
+      ==
+        ::  handle kicks by re-subscribing
+    ==
+  ==
+::
 ++  on-arvo  on-arvo:def
 ++  on-fail  on-fail:def
 --

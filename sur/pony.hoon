@@ -18,4 +18,7 @@
      ::[%new-message text=@t =id]
      ::[%post text=@p =id]
   == 
++$  update
+  $%  [%thread =id =thread]
+  ==
 --
