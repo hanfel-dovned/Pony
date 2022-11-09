@@ -69,8 +69,17 @@
                          (snoc participants:action our.bowl)
                          voyeurs:action
                      ==
-      `state(threads (~(put by threads) now.bowl newthread))
-      ::  invite cards here
+      :_  state(threads (~(put by threads) now.bowl newthread))
+      =-  -.-
+      %^  spin  (weld participants:action voyeurs:action)
+          now.bowl
+      |=  [=ship id=@da]
+      :_  id
+      :*  %pass  /invites  %agent
+          [ship %pony]
+          %poke  %pony-action
+          !>([%invite id])  
+      ==
     ::
     ::  Duplicate thread and invite new participants.
         %fork-thread
@@ -83,8 +92,17 @@
                          (snoc participants:action our.bowl)
                          voyeurs:action
                      ==
-      `state(threads (~(put by threads) now.bowl newthread))
-      ::invite other ships
+      :_  state(threads (~(put by threads) now.bowl newthread))
+      =-  -.-
+      %^  spin  (weld participants:action voyeurs:action)
+          now.bowl
+      |=  [=ship id=@da]
+      :_  id
+      :*  %pass  /invites  %agent
+          [ship %pony]
+          %poke  %pony-action
+          !>([%invite id])  
+      ==
     ::
     ::  If host: add ship to thread as participant.
     ::  If participant: forward this poke to the host.
@@ -95,7 +113,8 @@
       ?:  =(host:thethread our.bowl)
         ?>  (is-member participants:thethread src.bowl)
         ?<  (is-member participants:thethread ship:action)
-        =/  newparticipants  (snoc participants:thethread ship:action)
+        =/  newparticipants
+            (snoc participants:thethread ship:action)
         =/  newthread  ^-  thread
                        :*  title:thethread
                            host:thethread
@@ -104,17 +123,30 @@
                            voyeurs:thethread
                        ==
         :_  state(threads (~(put by threads) id:action newthread))
-        :~  [%pass /invites %agent [ship:action %pony] %poke %pony-action !>([%invite id:action])]
+        :~  :*  %pass  /invites  %agent
+                [ship:action %pony]
+                %poke  %pony-action
+                !>([%invite id:action])  
+            ==
         ==
-      `state
-      :: ?>  =(our.bowl src.bowl) ::otherwise participant A could route request to host through B
-      :: run add-ship poke on host:thethread
+        ::
+      ?>  =(our.bowl src.bowl)
+      :_  state
+      :~  :*  %pass  /addship  %agent  
+              [host:thethread %pony]
+              %poke  %pony-action
+              !>([%add-ship id:action ship:action])
+          ==
+      ==
     ::
     ::  Remote hosts call this to add me to a thread.
         %invite
       ?<  (~(has by threads) id:action)
       :_  state
-      :~  [%pass /updates/(scot %da id:action) %agent [src.bowl %pony] %watch /(scot %da id:action)]
+      :~  :*  %pass  /updates/(scot %da id:action)
+              %agent  [src.bowl %pony]
+              %watch  /(scot %da id:action)
+          ==
       ==
     ==
   --
@@ -136,7 +168,10 @@
             (is-member voyeurs:thethread src.bowl)
         ==
     :_  this
-    :~  [%give %fact ~ %pony-update !>(`update`[%thread theid thethread])]
+    :~  :*  %give  %fact  ~
+            %pony-update 
+            !>(`update`[%thread theid thethread])
+        ==
     ==
   ==
 ::
