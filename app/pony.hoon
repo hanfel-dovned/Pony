@@ -5,7 +5,7 @@
 +$  versioned-state
   $%  state-0
   ==
-+$  state-0  [%0 =threads]
++$  state-0  [%0 =threads =drafts]
 +$  card  card:agent:gall
 --
 %-  agent:dbug
@@ -62,14 +62,15 @@
     ::  Update state with new thread and invite participants.
         %new-thread
       ?>  =(src.bowl our.bowl)
-      =/  newthread  ^-  thread  
-                     :*  title:action
-                         our.bowl
-                         ~[message:action]
-                         (snoc participants:action our.bowl)
-                         voyeurs:action
-                     ==
-      :_  state(threads (~(put by threads) now.bowl newthread))
+      =/  newt
+        ^-  thread  
+        :*  title:action
+            our.bowl
+            ~[message:action]
+            (snoc participants:action our.bowl)
+            voyeurs:action
+        ==
+      :_  state(threads (~(put by threads) now.bowl newt))
       =-  -.-
       %^  spin  (weld participants:action voyeurs:action)
           now.bowl
@@ -84,15 +85,17 @@
     ::  Duplicate thread and invite new participants.
         %fork-thread
       ?>  =(src.bowl our.bowl)
-      =/  oldthread  ^-  thread  (~(got by threads) id:action)
-      =/  newthread  ^-  thread
-                     :*  title:oldthread
-                         our.bowl
-                         messages:oldthread
-                         (snoc participants:action our.bowl)
-                         voyeurs:action
-                     ==
-      :_  state(threads (~(put by threads) now.bowl newthread))
+      =/  oldt  
+        ^-  thread  (~(got by threads) id:action)
+      =/  newt
+        ^-  thread
+        :*  title:oldt
+            our.bowl
+            messages:oldt
+            (snoc participants:action our.bowl)
+            voyeurs:action
+        ==
+      :_  state(threads (~(put by threads) now.bowl newt))
       =-  -.-
       %^  spin  (weld participants:action voyeurs:action)
           now.bowl
@@ -107,22 +110,31 @@
     ::  If host: add ship to thread as participant.
     ::  If participant: forward this poke to the host.
         %add-ship
-      =/  thethread  
+      =/  oldt  
           ^-  thread  
           (~(got by threads) id:action)
-      ?:  =(host:thethread our.bowl)
-        ?>  (is-member participants:thethread src.bowl)
-        ?<  (is-member participants:thethread ship:action)
+      ?:  =(host:oldt our.bowl)
+        ?>  (is-member participants:oldt src.bowl)
+        ?<  (is-member participants:oldt ship:action)
         =/  newparticipants
-            (snoc participants:thethread ship:action)
-        =/  newthread  ^-  thread
-                       :*  title:thethread
-                           host:thethread
-                           messages:thethread
-                           newparticipants
-                           voyeurs:thethread
-                       ==
-        :_  state(threads (~(put by threads) id:action newthread))
+            (snoc participants:oldt ship:action)
+        =/  newt
+          ^-  thread
+          :*  title:oldt
+              host:oldt
+              messages:oldt
+              newparticipants
+              ?.  (is-member voyeurs:oldt src.bowl)
+                voyeurs:oldt
+              %+  oust
+                :-  =<  +
+                    %+  find  
+                      ~[src.bowl]
+                    voyeurs:oldt
+                1
+              voyeurs:oldt
+          ==
+        :_  state(threads (~(put by threads) id:action newt))
         :~  :*  %pass  /invites  %agent
                 [ship:action %pony]
                 %poke  %pony-action
@@ -130,14 +142,14 @@
             ==
             :*  %give  %fact  ~[/(scot %da id:action)]
                 %pony-update 
-                !>(`update`[%thread id:action newthread])
+                !>(`update`[%thread id:action newt(voyeurs ~)])
             ==
         ==
         ::
       ?>  =(our.bowl src.bowl)
       :_  state
       :~  :*  %pass  /addship  %agent  
-              [host:thethread %pony]
+              [host:oldt %pony]
               %poke  %pony-action
               !>([%add-ship id:action ship:action])
           ==
@@ -156,36 +168,53 @@
     ::  If host: append message to thread.
     ::  If participant: forward poke to host.
         %new-message
-      =/  thethread  
+      =/  oldt  
         ^-  thread  
         (~(got by threads) id:action)
-      ?:  =(host:thethread our.bowl)
-        ?>  (is-member participants:thethread src.bowl)
-        =/  newmessage  :+  now.bowl
-                            text:action
-                            src.bowl
-        =/  newthread  ^-  thread
-                      :*  title:thethread
-                          host:thethread
-                          (snoc messages:thethread newmessage)
-                          participants:thethread
-                          voyeurs:thethread
-                      ==
-        :_  state(threads (~(put by threads) id:action newthread))
+      ?:  =(host:oldt our.bowl)
+        ?>  ?|  (is-member participants:oldt src.bowl)
+                (is-member voyeurs:oldt src.bowl)
+            ==
+        =/  newmessage
+          :+  now.bowl
+          text:action
+          src.bowl  
+        =/  newt  
+          ^-  thread
+          :*  title:oldt
+              host:oldt
+              (snoc messages:oldt newmessage)
+              ?.  (is-member voyeurs:oldt src.bowl)
+                :-  participants:oldt
+                voyeurs:oldt
+              :-  (snoc participants:oldt src.bowl)
+              %+  oust
+                :-  =<  +
+                    %+  find  
+                      ~[src.bowl]
+                    voyeurs:oldt
+                1
+              voyeurs:oldt
+          ==
+        :_  state(threads (~(put by threads) id:action newt))
         :~  :*  %give  %fact  ~[/(scot %da id:action)]
                 %pony-update 
-                !>(`update`[%thread id:action newthread])
+                !>(`update`[%thread id:action newt(voyeurs ~)])
             ==
         ==
         ::
       ?>  =(our.bowl src.bowl)
       :_  state
       :~  :*  %pass  /post  %agent
-              [host:thethread %pony]
+              [host:oldt %pony]
               %poke  %pony-action
               !>([%post id:action text:action])
           ==
       ==
+      ::
+      ::  Save a draft.
+          %new-draft
+        `state(drafts (snoc drafts draft:action))
     ==
   --
 ++  on-peek  on-peek:def
@@ -199,16 +228,16 @@
   ::  Watch paths are the ID of the thread
       [@ ~]
     =/  theid  (slav %da -.path)
-    =/  thethread  
+    =/  th
         ^-  thread  
         (~(got by threads) theid)
-    ?>  ?|  (is-member participants:thethread src.bowl)
-            (is-member voyeurs:thethread src.bowl)
+    ?>  ?|  (is-member participants:th src.bowl)
+            (is-member voyeurs:th src.bowl)
         ==
     :_  this
     :~  :*  %give  %fact  ~
             %pony-update 
-            !>(`update`[%thread theid thethread])
+            !>(`update`[%thread theid th(voyeurs ~)])
         ==
     ==
   ==
