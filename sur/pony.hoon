@@ -15,8 +15,8 @@
       [%fork-thread =id =participants =voyeurs]
       [%add-ship =id =ship]
       [%invite =id]
-     ::[%new-message text=@t =id]
-     ::[%post text=@p =id]
+      [%new-message =id text=@t]
+      ::[%post =id text=@t]
   == 
 +$  update
   $%  [%thread =id =thread]

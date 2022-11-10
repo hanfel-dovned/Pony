@@ -128,6 +128,10 @@
                 %poke  %pony-action
                 !>([%invite id:action])  
             ==
+            :*  %give  %fact  ~[/(scot %da id:action)]
+                %pony-update 
+                !>(`update`[%thread id:action newthread])
+            ==
         ==
         ::
       ?>  =(our.bowl src.bowl)
@@ -146,6 +150,40 @@
       :~  :*  %pass  /updates/(scot %da id:action)
               %agent  [src.bowl %pony]
               %watch  /(scot %da id:action)
+          ==
+      ==
+    ::
+    ::  If host: append message to thread.
+    ::  If participant: forward poke to host.
+        %new-message
+      =/  thethread  
+        ^-  thread  
+        (~(got by threads) id:action)
+      ?:  =(host:thethread our.bowl)
+        ?>  (is-member participants:thethread src.bowl)
+        =/  newmessage  :+  now.bowl
+                            text:action
+                            src.bowl
+        =/  newthread  ^-  thread
+                      :*  title:thethread
+                          host:thethread
+                          (snoc messages:thethread newmessage)
+                          participants:thethread
+                          voyeurs:thethread
+                      ==
+        :_  state(threads (~(put by threads) id:action newthread))
+        :~  :*  %give  %fact  ~[/(scot %da id:action)]
+                %pony-update 
+                !>(`update`[%thread id:action newthread])
+            ==
+        ==
+        ::
+      ?>  =(our.bowl src.bowl)
+      :_  state
+      :~  :*  %pass  /post  %agent
+              [host:thethread %pony]
+              %poke  %pony-action
+              !>([%post id:action text:action])
           ==
       ==
     ==
