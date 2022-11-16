@@ -48,12 +48,89 @@
     =^  cards  state
       (handle-action action)
     [cards this]
-    ::  %handle-http-request
-    ::?>  =(src.bowl our.bowl)
-    ::=^  cards  state
-    ::  (handle-http !<([@ta =inbound-request:eyre] vase))
-    ::[cards this]
+      %handle-http-request
+    ?>  =(src.bowl our.bowl)
+    =^  cards  state
+      (handle-http !<([@ta =inbound-request:eyre] vase))
+    [cards this]
   ==
+  ::
+  ++  handle-http
+    |=  [eyre-id=@ta =inbound-request:eyre]
+    ^-  (quip card _state)
+    =/  ,request-line:server
+      (parse-request-line:server url.request.inbound-request)
+    =+  send=(cury response:schooner eyre-id)
+    ?.  authenticated.inbound-request
+      :_  state
+      %-  send
+      [302 ~ [%login-redirect './apps/page']]
+    ::
+    ?+    method.request.inbound-request  
+      [(send [405 ~ [%stock ~]]) state]
+      ::
+        %'GET'
+      ?+    site  
+          :_  state 
+          (send [404 ~ [%plain "404 - Not Found"]])
+        ::
+          [%apps %pony ~]
+        :_  state
+        (send [200 ~ [%html pony-ui]])
+          ::
+          [%apps %pony %state ~]
+        :_  state
+        (send [200 ~ [%json (enjs-state +.state)]])
+      == 
+    ==
+  ::
+  ++  enjs-state
+    =,  enjs:format
+    |=  $:
+            =^threads
+            =^drafts
+        ==
+    ^-  json
+    :-  %a
+    :~
+      :-  %a
+      %+  turn
+        ~(tap by threads)
+      |=  [=id =thread]
+      :-  %a
+      :~
+          [%s title:thread]
+          [%s (scot %p host:thread)]
+          ::
+          :-  %a
+          %+  turn  messages:thread
+          |=  =message
+          :-  %a
+          :~
+            [%s (scot %da date:message)]
+            [%s text:message]
+            [%s (scot %p sender:message)]
+          ==
+          ::
+          :-  %a
+          %+  turn  participants:thread
+          |=  part=@p  [%s (scot %p part)]
+          ::
+          :-  %a
+          %+  turn  voyeurs:thread
+          |=  voy=@p  [%s (scot %p voy)]
+      ==
+      ::
+      :-  %a
+      %+  turn  drafts
+      |=  [=id text=@t]
+      :-  %a
+      :~
+          [%s (scot %da id)]
+          [%s text]
+      ==
+    ==
+  ::
   ++  handle-action
     |=  =action
     ^-  (quip card _state)
