@@ -79,6 +79,7 @@
       ?~  body.request.inbound-request
         [(send [405 ~ [%stock ~]]) state]
       =/  json  (de-json:html q.u.body.request.inbound-request)
+      ~&  json
       =/  action  (dejs-action +.json)
       ~&  "Parsed JSON"
       (handle-action action)
@@ -164,6 +165,7 @@
     :~  [%add-ship (at ~[(se %da) (se %p)])]  
         [%new-message (at ~[(se %da) so])]
         [%new-draft (at ~[(se %da) so])]
+        [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
     ==
   ::
   ++  handle-action
@@ -178,7 +180,7 @@
         ^-  thread  
         :*  title:action
             our.bowl
-            ~[message:action]
+            ~[[now.bowl text:action our.bowl]]
             (snoc participants:action our.bowl)
             voyeurs:action
         ==

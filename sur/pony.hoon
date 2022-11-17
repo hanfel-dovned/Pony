@@ -13,7 +13,7 @@
 +$  draft  [=id text=@t]
 +$  drafts  (list draft)
 +$  action
-  $%  [%new-thread title=@t =message =participants =voyeurs]
+  $%  [%new-thread title=@t text=@t =participants =voyeurs]
       [%fork-thread =id =participants =voyeurs]
       [%add-ship =id =ship]
       [%invite =id]
