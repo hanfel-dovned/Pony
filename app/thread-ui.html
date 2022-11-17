@@ -17,13 +17,13 @@
     <script>
     
 
-/*function post(tag, data) {
+function post(tag, data) {
     fetch('/apps/pony', {
         method: 'POST',
         body: JSON.stringify({[tag]: data})
     })
     location.reload()
-}*/
+}
 
 getState()
     .then((state) => renderPage(state))
@@ -34,12 +34,15 @@ async function getState() {
 }
 
 
-/*function postNewPage()
+function postAddShip()
 {
-    post("new-page", [document.getElementById('nameBox').value, document.getElementById('htmlBox').value]);
+    threadID = window.location.href.split("/")
+    threadID = threadID[threadID.length - 1]
+
+    post("add-ship", [threadID, document.getElementById('addShipBox').value]);
 }
 
-function postDeletePage()
+/*function postDeletePage()
 {
     var page = event.currentTarget.myPage;
     post("delete-page", page);
@@ -62,6 +65,16 @@ function renderPage(state)
         messages.appendChild(document.createElement("br"));
         messages.appendChild(document.createElement("br"));
     }
+
+    const addShipBox = document.createElement('input'); 
+    addShipBox.type = "text"; 
+    addShipBox.id = "addShipBox";
+    messages.appendChild(addShipBox);
+
+    const addShipButton = document.createElement("button");
+    addShipButton.textContent = "Add Ship to Thread";
+    addShipButton.addEventListener('click', postAddShip);
+    messages.appendChild(addShipButton);
 }
 
 </script>

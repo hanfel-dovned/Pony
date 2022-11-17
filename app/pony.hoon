@@ -66,10 +66,21 @@
     ?.  authenticated.inbound-request
       :_  state
       %-  send
-      [302 ~ [%login-redirect './apps/page']]
+      [302 ~ [%login-redirect './apps/pony']]
     ::
     ?+    method.request.inbound-request  
       [(send [405 ~ [%stock ~]]) state]
+      ::
+        %'POST'
+      ?.  authenticated.inbound-request
+        :_  state
+        %-  send
+        [302 ~ [%login-redirect './apps/pony']]
+      ?~  body.request.inbound-request
+        [(send [405 ~ [%stock ~]]) state]
+      =/  json  (de-json:html q.u.body.request.inbound-request)
+      =/  action  (dejs-action +.json)
+      (handle-action action) 
       ::
         %'GET'
       ?+    site  
@@ -140,6 +151,16 @@
           [%s (scot %da id)]
           [%s text]
       ==
+    ==
+  ::
+  ++  dejs-action
+    =,  dejs:format
+    |=  jon=json
+    ^-  action
+    %.  jon
+    %-  of
+    :~  [%add-ship (at ~[(se %da) (se %p)])]  
+        ::[%delete-page so]
     ==
   ::
   ++  handle-action
@@ -302,7 +323,14 @@
       ::
       ::  Save a draft.
           %new-draft
+        ?>  =(src.bowl our.bowl)
         `state(drafts (snoc drafts draft:action))
+      ::
+      ::  Delete a draft.
+          %delete-draft
+        ?>  =(src.bowl our.bowl)
+        =/  i  (find ~[draft:action] drafts)
+        `state(drafts (oust [+.i 0] drafts))
     ==
   --
 ++  on-peek  on-peek:def

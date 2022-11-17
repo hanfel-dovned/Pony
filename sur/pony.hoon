@@ -19,6 +19,7 @@
       [%invite =id]
       [%new-message =id text=@t]
       [%new-draft =draft]
+      [%delete-draft =draft]
   ==
 +$  update
   $%  [%thread =id =thread]
