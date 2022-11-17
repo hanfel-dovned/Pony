@@ -80,7 +80,8 @@
         [(send [405 ~ [%stock ~]]) state]
       =/  json  (de-json:html q.u.body.request.inbound-request)
       =/  action  (dejs-action +.json)
-      (handle-action action) 
+      ~&  "Parsed JSON"
+      (handle-action action)
       ::
         %'GET'
       ?+    site  
@@ -154,13 +155,15 @@
     ==
   ::
   ++  dejs-action
+  ~&  "Got JSON"
     =,  dejs:format
     |=  jon=json
     ^-  action
     %.  jon
     %-  of
     :~  [%add-ship (at ~[(se %da) (se %p)])]  
-        ::[%delete-page so]
+        [%new-message (at ~[(se %da) so])]
+        [%new-draft (at ~[(se %da) so])]
     ==
   ::
   ++  handle-action

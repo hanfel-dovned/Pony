@@ -45,17 +45,61 @@ function postDeletePage()
     post("delete-page", page);
 }*/
 
+var draftID = window.location.href.split("/")
+draftID = draftID[draftID.length - 1]
+
+function postNewMessage()
+{
+    post("new-message", [draftID, document.getElementById('messageBox').value]);
+}
+
+function postNewDraft()
+{
+    post("new-draft", [draftID, document.getElementById('messageBox').value]);
+}
+
+function postDeleteDraft()
+{
+    post("new-draft", [draftID, document.getElementById('text').textContent]);
+}
+
 function renderPage(state)
 {
     const draft = document.getElementById("threads");
 
-    draftID = window.location.href.split("/")
-    draftID = draftID[draftID.length - 1]
-    draftIndex = state[1].findIndex(x => x[0] == draftID)
+    //Add draft to page.
+    const draftIndex = state[1].findIndex(x => x[0] == draftID)
 
     const text = document.createElement("p");
+    text.id = "text"
     text.textContent = state[1][draftIndex][1];
     draft.appendChild(text);
+
+    //Add posting textbox and buttons to page.
+    const messageBox = document.createElement('input'); 
+    messageBox.type = "text"; 
+    messageBox.id = "messageBox";
+    messages.appendChild(messageBox);
+
+    threads.appendChild(document.createElement("br"));
+
+    const messageButton = document.createElement("button");
+    messageButton.textContent = "Post Draft to Thread";
+    messageButton.addEventListener('click', postNewMessage);
+    messages.appendChild(messageButton);
+
+    const draftButton = document.createElement("button");
+    draftButton.textContent = "Save Draft";
+    draftButton.addEventListener('click', postNewDraft);
+    messages.appendChild(draftButton);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete Draft";
+    deleteButton.addEventListener('click', postDeleteDraft);
+    messages.appendChild(deleteButton);
+
+    threads.appendChild(document.createElement("br"));
+    threads.appendChild(document.createElement("br"));
 }
 
 </script>

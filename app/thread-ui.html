@@ -33,13 +33,22 @@ async function getState() {
     return response.json()
 }
 
+var threadID = window.location.href.split("/")
+threadID = threadID[threadID.length - 1]
 
 function postAddShip()
 {
-    threadID = window.location.href.split("/")
-    threadID = threadID[threadID.length - 1]
-
     post("add-ship", [threadID, document.getElementById('addShipBox').value]);
+}
+
+function postNewMessage()
+{
+    post("new-message", [threadID, document.getElementById('messageBox').value]);
+}
+
+function postNewDraft()
+{
+    post("new-draft", [threadID, document.getElementById('messageBox').value]);
 }
 
 /*function postDeletePage()
@@ -50,11 +59,10 @@ function postAddShip()
 
 function renderPage(state)
 {
+    //Add messages to page.
     const messages = document.getElementById("threads");
 
-    threadID = window.location.href.split("/")
-    threadID = threadID[threadID.length - 1]
-    threadIndex = state[0].findIndex(x => x[0] == threadID)
+    const threadIndex = state[0].findIndex(x => x[0] == threadID)
 
     for(var i = 0; i < state[0][threadIndex][3].length; i++)
     {
@@ -66,6 +74,7 @@ function renderPage(state)
         messages.appendChild(document.createElement("br"));
     }
 
+    //Add "Add Ship" button to page.
     const addShipBox = document.createElement('input'); 
     addShipBox.type = "text"; 
     addShipBox.id = "addShipBox";
@@ -75,6 +84,30 @@ function renderPage(state)
     addShipButton.textContent = "Add Ship to Thread";
     addShipButton.addEventListener('click', postAddShip);
     messages.appendChild(addShipButton);
+
+    threads.appendChild(document.createElement("br"));
+    threads.appendChild(document.createElement("br"));
+
+    //Add posting textbox and buttons to page.
+    const messageBox = document.createElement('input'); 
+    messageBox.type = "text"; 
+    messageBox.id = "messageBox";
+    messages.appendChild(messageBox);
+
+    threads.appendChild(document.createElement("br"));
+
+    const messageButton = document.createElement("button");
+    messageButton.textContent = "Post";
+    messageButton.addEventListener('click', postNewMessage);
+    messages.appendChild(messageButton);
+
+    const draftButton = document.createElement("button");
+    draftButton.textContent = "Save Draft";
+    draftButton.addEventListener('click', postNewDraft);
+    messages.appendChild(draftButton);
+
+    threads.appendChild(document.createElement("br"));
+    threads.appendChild(document.createElement("br"));
 }
 
 </script>
