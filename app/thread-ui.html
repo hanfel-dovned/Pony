@@ -1,0 +1,68 @@
+<head>
+  <style>
+    body { 
+      background-color: white; 
+      font-family: "arial"; 
+      text-align: center;
+      border-radius: 5;
+      color: black;
+    }
+  </style>
+  <title>Pony</title>
+</head>
+
+<body>
+  <main>
+    <div id="threads"></div>
+    <script>
+    
+
+/*function post(tag, data) {
+    fetch('/apps/pony', {
+        method: 'POST',
+        body: JSON.stringify({[tag]: data})
+    })
+    location.reload()
+}*/
+
+getState()
+    .then((state) => renderPage(state))
+
+async function getState() {
+    const response = await fetch('/apps/pony/state')
+    return response.json()
+}
+
+
+/*function postNewPage()
+{
+    post("new-page", [document.getElementById('nameBox').value, document.getElementById('htmlBox').value]);
+}
+
+function postDeletePage()
+{
+    var page = event.currentTarget.myPage;
+    post("delete-page", page);
+}*/
+
+function renderPage(state)
+{
+    const messages = document.getElementById("threads");
+
+    threadID = window.location.href.split("/")
+    threadID = threadID[threadID.length - 1]
+    threadIndex = state[0].findIndex(x => x[0] == threadID)
+
+    for(var i = 0; i < state[0][threadIndex][3].length; i++)
+    {
+        const message = document.createElement("a");
+        message.textContent = state[0][threadIndex][3][i];
+        messages.appendChild(message);
+
+        messages.appendChild(document.createElement("br"));
+        messages.appendChild(document.createElement("br"));
+    }
+}
+
+</script>
+</main>

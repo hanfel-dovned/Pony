@@ -1,0 +1,62 @@
+<head>
+  <style>
+    body { 
+      background-color: white; 
+      font-family: "arial"; 
+      text-align: center;
+      border-radius: 5;
+      color: black;
+    }
+  </style>
+  <title>Pony</title>
+</head>
+
+<body>
+  <main>
+    <div id="threads"></div>
+    <script>
+    
+
+/*function post(tag, data) {
+    fetch('/apps/pony', {
+        method: 'POST',
+        body: JSON.stringify({[tag]: data})
+    })
+    location.reload()
+}*/
+
+getState()
+    .then((state) => renderPage(state))
+
+async function getState() {
+    const response = await fetch('/apps/pony/state')
+    return response.json()
+}
+
+
+/*function postNewPage()
+{
+    post("new-page", [document.getElementById('nameBox').value, document.getElementById('htmlBox').value]);
+}
+
+function postDeletePage()
+{
+    var page = event.currentTarget.myPage;
+    post("delete-page", page);
+}*/
+
+function renderPage(state)
+{
+    const draft = document.getElementById("threads");
+
+    draftID = window.location.href.split("/")
+    draftID = draftID[draftID.length - 1]
+    draftIndex = state[1].findIndex(x => x[0] == draftID)
+
+    const text = document.createElement("p");
+    text.textContent = state[1][draftIndex][1];
+    draft.appendChild(text);
+}
+
+</script>
+</main>

@@ -1,6 +1,8 @@
 /-  *pony
 /+  dbug, default-agent, server, schooner
-/*  pony-ui  %html  /app/pony-ui/html
+/*  pony-ui     %html  /app/pony-ui/html
+/*  thread-ui   %html  /app/thread-ui/html
+/*  draft-ui    %html  /app/draft-ui/html
 |%
 +$  versioned-state
   $%  state-0
@@ -73,7 +75,7 @@
       ?+    site  
           :_  state 
           (send [404 ~ [%plain "404 - Not Found"]])
-        ::
+          ::
           [%apps %pony ~]
         :_  state
         (send [200 ~ [%html pony-ui]])
@@ -81,6 +83,14 @@
           [%apps %pony %state ~]
         :_  state
         (send [200 ~ [%json (enjs-state +.state)]])
+          ::
+          [%apps %pony @da ~]
+        :_  state
+        (send [200 ~ [%html thread-ui]])
+          ::
+          [%apps %pony %drafts @da ~]
+        :_  state
+        (send [200 ~ [%html draft-ui]])
       == 
     ==
   ::
@@ -99,6 +109,7 @@
       |=  [=id =thread]
       :-  %a
       :~
+          [%s (scot %da id)]
           [%s title:thread]
           [%s (scot %p host:thread)]
           ::
