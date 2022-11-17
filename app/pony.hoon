@@ -166,6 +166,7 @@
         [%new-message (at ~[(se %da) so])]
         [%new-draft (at ~[(se %da) so])]
         [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
+        [%fork-thread (at ~[(se %da) (ar (se %p)) (ar (se %p))])]
     ==
   ::
   ++  handle-action

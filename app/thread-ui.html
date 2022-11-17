@@ -7,13 +7,35 @@
       border-radius: 5;
       color: black;
     }
+
+    .content {
+      padding: 18px;
+      display: none;
+      overflow: hidden;
+      background-color: white;
+    }
   </style>
   <title>Pony</title>
 </head>
 
 <body>
   <main>
-    <div id="threads"></div>
+    <div id="messages"></div>
+    <textarea id="messageBox" rows="10" cols="50"></textarea><br><br>
+    <button onclick="postNewMessage()">Post</button>   
+    <button onclick="postNewDraft()">Save Draft</button><br><br><br>
+    <input type="text" id="addShipBox" placeholder="~sampel-palnet">
+    <button onclick="postAddShip()">Add Ship to Thread</button><br><br><br>
+    <button type="button" class="collapsible">Fork Thread</button>
+    <div class="content">
+        <label for="PublicParticipants">Public Participants</label>
+        <br>
+        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <label for="SecretParticipants">Secret Participants</label>
+        <br>
+        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <button onclick="postForkThread()">Fork Thread</button>
+    </div>
     <script>
     
 
@@ -36,6 +58,22 @@ async function getState() {
 var threadID = window.location.href.split("/")
 threadID = threadID[threadID.length - 1]
 
+//Logic for collapsible new thread form
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+
 function postAddShip()
 {
     post("add-ship", [threadID, document.getElementById('addShipBox').value]);
@@ -51,63 +89,59 @@ function postNewDraft()
     post("new-draft", [threadID, document.getElementById('messageBox').value]);
 }
 
-/*function postDeletePage()
+function postForkThread()
 {
-    var page = event.currentTarget.myPage;
-    post("delete-page", page);
-}*/
+    post("fork-thread", [threadID, document.getElementById('participantBox').value.split(" "),
+                                    document.getElementById('voyeurBox').value.split(" "),]);
+}
 
 function renderPage(state)
 {
     //Add messages to page.
-    const messages = document.getElementById("threads");
+    const messages = document.getElementById("messages");
 
     const threadIndex = state[0].findIndex(x => x[0] == threadID)
 
+    const title = document.createElement("h2");
+    title.textContent = state[0][threadIndex][1];
+    messages.appendChild(title);
+
+    const partHeader = document.createElement("a");
+    partHeader.textContent = "Participants: ";
+    messages.appendChild(partHeader);
+
+    for(var i = 0; i < state[0][threadIndex][4].length; i++)
+    {
+        const participant = document.createElement("a");
+        participant.textContent = state[0][threadIndex][4][i] + " ";
+        messages.appendChild(participant);
+    }
+
+    messages.appendChild(document.createElement("br"));
+    messages.appendChild(document.createElement("br"));
+    messages.appendChild(document.createElement("br"));
+
     for(var i = 0; i < state[0][threadIndex][3].length; i++)
     {
+        
         const message = document.createElement("a");
-        message.textContent = state[0][threadIndex][3][i];
+        message.textContent = state[0][threadIndex][3][i][1];
         messages.appendChild(message);
+        messages.appendChild(document.createElement("br"));
+        messages.appendChild(document.createElement("br"));
 
+        const author = document.createElement("a");
+        author.textContent = state[0][threadIndex][3][i][2] + " - ";
+        messages.appendChild(author);
+
+        const date = document.createElement("a");
+        date.textContent = state[0][threadIndex][3][i][0];
+        messages.appendChild(date);
+
+        messages.appendChild(document.createElement("br"));
         messages.appendChild(document.createElement("br"));
         messages.appendChild(document.createElement("br"));
     }
-
-    //Add "Add Ship" button to page.
-    const addShipBox = document.createElement('input'); 
-    addShipBox.type = "text"; 
-    addShipBox.id = "addShipBox";
-    messages.appendChild(addShipBox);
-
-    const addShipButton = document.createElement("button");
-    addShipButton.textContent = "Add Ship to Thread";
-    addShipButton.addEventListener('click', postAddShip);
-    messages.appendChild(addShipButton);
-
-    threads.appendChild(document.createElement("br"));
-    threads.appendChild(document.createElement("br"));
-
-    //Add posting textbox and buttons to page.
-    const messageBox = document.createElement('input'); 
-    messageBox.type = "text"; 
-    messageBox.id = "messageBox";
-    messages.appendChild(messageBox);
-
-    threads.appendChild(document.createElement("br"));
-
-    const messageButton = document.createElement("button");
-    messageButton.textContent = "Post";
-    messageButton.addEventListener('click', postNewMessage);
-    messages.appendChild(messageButton);
-
-    const draftButton = document.createElement("button");
-    draftButton.textContent = "Save Draft";
-    draftButton.addEventListener('click', postNewDraft);
-    messages.appendChild(draftButton);
-
-    threads.appendChild(document.createElement("br"));
-    threads.appendChild(document.createElement("br"));
 }
 
 </script>
