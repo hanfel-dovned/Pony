@@ -204,7 +204,7 @@
         ^-  thread  (~(got by threads) id:action)
       =/  newt
         ^-  thread
-        :*  title:oldt
+        :*  (crip (weld (trip title:oldt) " [fork]"))
             our.bowl
             messages:oldt
             (snoc participants:action our.bowl)
@@ -381,7 +381,17 @@
           `this(threads (~(put by threads) id:newupdate thread:newupdate))
         ==
       ==
-        ::  handle kicks by re-subscribing
+      ::
+      ::  Not quite sure this is right. 
+      ::  If people have issues getting updates, 
+      ::  check this first.
+        %kick
+      :_  this
+      :~  :*  %pass   wire
+              %agent  [src.bowl %pony]
+              %watch  /(scot %da +6:wire)
+          ==
+      ==
     ==
   ==
 ::
