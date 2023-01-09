@@ -79,9 +79,7 @@
       ?~  body.request.inbound-request
         [(send [405 ~ [%stock ~]]) state]
       =/  json  (de-json:html q.u.body.request.inbound-request)
-      ~&  json
       =/  action  (dejs-action +.json)
-      ~&  "Parsed JSON"
       (handle-action action)
       ::
         %'GET'
@@ -156,7 +154,6 @@
     ==
   ::
   ++  dejs-action
-  ~&  "Got JSON"
     =,  dejs:format
     |=  jon=json
     ^-  action
@@ -280,50 +277,50 @@
           ==
       ==
     ::
-    ::  If host: append message to thread.
     ::  If participant: forward poke to host.
+    ::  If host: append message to thread.
         %new-message
       =/  oldt  
         ^-  thread  
         (~(got by threads) id:action)
-      ?:  =(host:oldt our.bowl)
-        ?>  ?|  (is-member participants:oldt src.bowl)
-                (is-member voyeurs:oldt src.bowl)
-            ==
-        =/  newmessage
-          :+  now.bowl
-          text:action
-          src.bowl  
-        =/  newt  
-          ^-  thread
-          :*  title:oldt
-              host:oldt
-              (snoc messages:oldt newmessage)
-              ?.  (is-member voyeurs:oldt src.bowl)
-                :-  participants:oldt
-                voyeurs:oldt
-              :-  (snoc participants:oldt src.bowl)
-              %+  oust
-                :-  =<  +
-                    %+  find  
-                      ~[src.bowl]
-                    voyeurs:oldt
-                1
-              voyeurs:oldt
-          ==
-        :_  state(threads (~(put by threads) id:action newt))
-        :~  :*  %give  %fact  ~[/(scot %da id:action)]
-                %pony-update 
-                !>(`update`[%thread id:action newt(voyeurs ~)])
+      ?.  =(host:oldt our.bowl)
+        ?>  =(our.bowl src.bowl)
+        :_  state
+        :~  :*  %pass  /post  %agent
+                [host:oldt %pony]
+                %poke  %pony-action
+                !>([%post id:action text:action])
             ==
         ==
         ::
-      ?>  =(our.bowl src.bowl)
-      :_  state
-      :~  :*  %pass  /post  %agent
-              [host:oldt %pony]
-              %poke  %pony-action
-              !>([%post id:action text:action])
+      ?>  ?|  (is-member participants:oldt src.bowl)
+              (is-member voyeurs:oldt src.bowl)
+          ==
+      =/  newmessage
+        :+  now.bowl
+        text:action
+        src.bowl  
+      =/  newt  
+        ^-  thread
+        :*  title:oldt
+            host:oldt
+            (snoc messages:oldt newmessage)
+            ?.  (is-member voyeurs:oldt src.bowl)
+              :-  participants:oldt
+              voyeurs:oldt
+            :-  (snoc participants:oldt src.bowl)
+            %+  oust
+              :-  =<  +
+                  %+  find  
+                    ~[src.bowl]
+                  voyeurs:oldt
+              1
+            voyeurs:oldt
+        ==
+      :_  state(threads (~(put by threads) id:action newt))
+      :~  :*  %give  %fact  ~[/(scot %da id:action)]
+              %pony-update 
+              !>(`update`[%thread id:action newt(voyeurs ~)])
           ==
       ==
       ::

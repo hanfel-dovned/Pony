@@ -64,10 +64,24 @@ async function getState() {
 
 function postNewThread()
 {
+    //If participants or voyeurs is blank, you should still be able to post
+    //the thread. This will handle both the case where the user correctly
+    //formats the (list @p) and the case where the user correctly leaves the box
+    //blank. TODO: The frontend should also disallow clicking the Create Thread button
+    //unless these lists are formatted correctly in the first place.
+
+    var participants = document.getElementById('participantBox').value.split(" ")
+    if(participants[0] == [''])
+      participants = []
+
+    var voyeurs = document.getElementById('voyeurBox').value.split(" ")
+    if(voyeurs[0] == [''])
+      voyeurs = []
+
     post("new-thread", [document.getElementById('titleBox').value, 
                         document.getElementById('messageBox').value,
-                        document.getElementById('participantBox').value.split(" "),
-                        document.getElementById('voyeurBox').value.split(" "),]);
+                        participants,
+                        voyeurs,]);
 }
 
 //Logic for collapsible new thread form
