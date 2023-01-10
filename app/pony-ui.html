@@ -131,7 +131,7 @@ function renderPage(state)
     {
         const thread = document.createElement("a");
         thread.textContent = state[0][i][1];
-        thread.setAttribute('href', "pony/" + state[0][i][0]);
+        thread.setAttribute('href', "pony/" + state[0][i][0] + "/t");
         threads.appendChild(thread);
 
         threads.appendChild(document.createElement("br"));

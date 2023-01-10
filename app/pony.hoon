@@ -95,13 +95,16 @@
         :_  state
         (send [200 ~ [%json (enjs-state +.state)]])
           ::
-          [%apps %pony @da ~]
-        :_  state
+          [%apps %pony @ %t ~]
+        =/  id  `@da`(slav %da +14:site)
+        =/  oldt  ^-  thread  (~(got by threads) id)
+        =/  newt  oldt(read %.y)
+        :_  state(threads (~(put by threads) id newt))
         (send [200 ~ [%html thread-ui]])
           ::
-          [%apps %pony %drafts @da ~]
-        :_  state
-        (send [200 ~ [%html draft-ui]])
+        ::    [%apps %pony %drafts @da ~]
+        ::  :_  state
+        ::  (send [200 ~ [%html draft-ui]])
       == 
     ==
   ::
@@ -181,6 +184,9 @@
             ~[[now.bowl text:action our.bowl]]
             (snoc participants:action our.bowl)
             voyeurs:action
+            'Threads'
+            ~
+            %.n
         ==
       :_  state(threads (~(put by threads) now.bowl newt))
       =-  -.-
@@ -201,11 +207,14 @@
         ^-  thread  (~(got by threads) id:action)
       =/  newt
         ^-  thread
-        :*  (crip (weld (trip title:oldt) " [fork]"))
-            our.bowl
-            messages:oldt
-            (snoc participants:action our.bowl)
-            voyeurs:action
+        %=  oldt
+          title  (crip (weld (trip title:oldt) " [fork]"))
+          host  our.bowl
+          participants  (snoc participants:action our.bowl)
+          voyeurs  voyeurs:action
+          folder  'Threads'
+          tags  ~
+          read  %.n
         ==
       :_  state(threads (~(put by threads) now.bowl newt))
       =-  -.-
@@ -225,45 +234,49 @@
       =/  oldt  
           ^-  thread  
           (~(got by threads) id:action)
-      ?:  =(host:oldt our.bowl)
-        ?>  (is-member participants:oldt src.bowl)
-        ?<  (is-member participants:oldt ship:action)
-        =/  newparticipants
-            (snoc participants:oldt ship:action)
-        =/  newt
-          ^-  thread
-          :*  title:oldt
-              host:oldt
-              messages:oldt
-              newparticipants
-              ?.  (is-member voyeurs:oldt src.bowl)
-                voyeurs:oldt
-              %+  oust
-                :-  =<  +
-                    %+  find  
-                      ~[src.bowl]
-                    voyeurs:oldt
-                1
-              voyeurs:oldt
-          ==
-        :_  state(threads (~(put by threads) id:action newt))
-        :~  :*  %pass  /invites  %agent
-                [ship:action %pony]
+      ?.  =(host:oldt our.bowl)
+        ?>  =(our.bowl src.bowl)
+        :_  state
+        :~  :*  %pass  /addship  %agent  
+                [host:oldt %pony]
                 %poke  %pony-action
-                !>([%invite id:action])  
-            ==
-            :*  %give  %fact  ~[/(scot %da id:action)]
-                %pony-update 
-                !>(`update`[%thread id:action newt(voyeurs ~)])
+                !>([%add-ship id:action ship:action])
             ==
         ==
-        ::
-      ?>  =(our.bowl src.bowl)
-      :_  state
-      :~  :*  %pass  /addship  %agent  
-              [host:oldt %pony]
+      ::
+      ?>  (is-member participants:oldt src.bowl)
+      ?<  (is-member participants:oldt ship:action)
+      =/  newparticipants
+          (snoc participants:oldt ship:action)
+      =/  newt
+        ^-  thread
+        %=  oldt
+          ::  If this came from a voyeur, reveal them
+          participants  
+            ?.  (is-member voyeurs:oldt src.bowl)
+              newparticipants
+            (snoc newparticipants src.bowl)
+          ::
+          voyeurs
+            ?.  (is-member voyeurs:oldt src.bowl)
+              voyeurs:oldt
+            %+  oust
+              :-  =<  +
+                  %+  find  
+                    ~[src.bowl]
+                  voyeurs:oldt
+              1
+            voyeurs:oldt
+        ==
+      :_  state(threads (~(put by threads) id:action newt))
+      :~  :*  %pass  /invites  %agent
+              [ship:action %pony]
               %poke  %pony-action
-              !>([%add-ship id:action ship:action])
+              !>([%invite id:action])  
+          ==
+          :*  %give  %fact  ~[/(scot %da id:action)]
+              %pony-update 
+              !>(`update`[%thread id:action newt(voyeurs ~)])
           ==
       ==
     ::
@@ -289,7 +302,7 @@
         :~  :*  %pass  /post  %agent
                 [host:oldt %pony]
                 %poke  %pony-action
-                !>([%post id:action text:action])
+                !>([%new-message id:action text:action])
             ==
         ==
         ::
@@ -302,13 +315,17 @@
         src.bowl  
       =/  newt  
         ^-  thread
-        :*  title:oldt
-            host:oldt
-            (snoc messages:oldt newmessage)
+        %=  oldt
+          messages  (snoc messages:oldt newmessage)
+          ::  If this came from a voyeur, reveal them
+          participants
             ?.  (is-member voyeurs:oldt src.bowl)
-              :-  participants:oldt
+              participants:oldt
+            (snoc participants:oldt src.bowl)
+          ::
+          voyeurs
+            ?.  (is-member voyeurs:oldt src.bowl)
               voyeurs:oldt
-            :-  (snoc participants:oldt src.bowl)
             %+  oust
               :-  =<  +
                   %+  find  
@@ -323,17 +340,53 @@
               !>(`update`[%thread id:action newt(voyeurs ~)])
           ==
       ==
-      ::
-      ::  Save a draft.
-          %new-draft
-        ?>  =(src.bowl our.bowl)
-        `state(drafts (snoc drafts draft:action))
-      ::
-      ::  Delete a draft.
-          %delete-draft
-        ?>  =(src.bowl our.bowl)
-        =/  i  (find ~[draft:action] drafts)
-        `state(drafts (oust [+.i 0] drafts))
+    ::
+    ::  Save a draft.
+        %new-draft
+      ?>  =(src.bowl our.bowl)
+      `state(drafts (snoc drafts draft:action))
+    ::
+    ::  Delete a draft.
+        %delete-draft
+      ?>  =(src.bowl our.bowl)
+      =/  i  (find ~[draft:action] drafts)
+      `state(drafts (oust [+.i 0] drafts))
+    ::
+    ::  Change a thread's folder.
+        %move-to-folder
+      ?>  =(src.bowl our.bowl)
+      =/  oldt  
+        ^-  thread  
+        (~(got by threads) id:action)
+      =/  newt
+        %=  oldt
+          folder  folder:action
+        ==
+      `state(threads (~(put by threads) id:action newt))
+    ::
+    ::  Add a tag to a thread.
+        %add-tag
+      ?>  =(src.bowl our.bowl)
+      =/  oldt  
+        ^-  thread  
+        (~(got by threads) id:action)
+      =/  newt
+        %=  oldt
+          tags  (~(put in tags:oldt) tag:action)
+        ==
+      `state(threads (~(put by threads) id:action newt))
+    ::
+    ::  Remove a tag to a thread.
+        %remove-tag
+      ?>  =(src.bowl our.bowl)
+      =/  oldt  
+        ^-  thread  
+        (~(got by threads) id:action)
+      =/  newt
+        %=  oldt
+          tags  (~(del in tags:oldt) tag:action)
+        ==
+      `state(threads (~(put by threads) id:action newt))
     ==
   --
 ++  on-peek  on-peek:def
@@ -375,7 +428,19 @@
         ?-    -.newupdate
             %thread
           ?>  =(id:newupdate (slav %da +6:wire))
-          `this(threads (~(put by threads) id:newupdate thread:newupdate))
+          ?.  (~(has by threads) id:newupdate)
+            :: this branch is where to insert pals tags
+            `this(threads (~(put by threads) id:newupdate thread:newupdate))
+          =/  oldt  ^-  thread
+            (~(got by threads) id:newupdate)
+          =/  newt  thread:newupdate
+          =.  newt
+            %=  newt
+              folder  folder:oldt
+              tags  tags:oldt
+              read  %.n
+            ==
+          `this(threads (~(put by threads) id:newupdate newt))
         ==
       ==
       ::

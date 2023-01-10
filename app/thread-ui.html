@@ -56,7 +56,7 @@ async function getState() {
 }
 
 var threadID = window.location.href.split("/")
-threadID = threadID[threadID.length - 1]
+threadID = threadID[threadID.length - 2]
 
 //Logic for collapsible new thread form
 var coll = document.getElementsByClassName("collapsible");

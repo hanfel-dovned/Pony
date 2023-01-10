@@ -8,6 +8,9 @@
                 messages=(list message) 
                 =participants
                 =voyeurs
+                folder=@t
+                tags=(set @t)
+                read=?
             == 
 +$  threads  (map =id =thread)
 +$  draft  [=id text=@t]
@@ -20,6 +23,9 @@
       [%new-message =id text=@t]
       [%new-draft =draft]
       [%delete-draft =draft]
+      [%move-to-folder =id folder=@t]
+      [%add-tag =id tag=@t]
+      [%remove-tag =id tag=@t]
   ==
 +$  update
   $%  [%thread =id =thread]
