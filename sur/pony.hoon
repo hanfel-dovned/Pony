@@ -13,7 +13,7 @@
                 read=?
             == 
 +$  threads  (map =id =thread)
-+$  draft  [=id text=@t]
++$  draft  [title=@t text=@t =participants =voyeurs]
 +$  drafts  (list draft)
 +$  action
   $%  [%new-thread title=@t text=@t =participants =voyeurs]

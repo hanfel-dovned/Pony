@@ -148,11 +148,19 @@
       ::
       :-  %a
       %+  turn  drafts
-      |=  [=id text=@t]
+      |=  [title=@t text=@t parts=(list @p) voys=(list @p)]
       :-  %a
       :~
-          [%s (scot %da id)]
+          [%s title]
           [%s text]
+          ::
+          :-  %a
+          %+  turn  parts
+          |=  part=@p  [%s (scot %p part)]
+          ::
+          :-  %a
+          %+  turn  voys
+          |=  voy=@p  [%s (scot %p voy)]
       ==
     ==
   ::
@@ -164,7 +172,7 @@
     %-  of
     :~  [%add-ship (at ~[(se %da) (se %p)])]  
         [%new-message (at ~[(se %da) so])]
-        [%new-draft (at ~[(se %da) so])]
+        [%new-draft (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%fork-thread (at ~[(se %da) (ar (se %p)) (ar (se %p))])]
     ==
