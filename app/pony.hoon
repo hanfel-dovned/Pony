@@ -144,6 +144,10 @@
           :-  %a
           %+  turn  voyeurs:thread
           |=  voy=@p  [%s (scot %p voy)]
+          ::
+          [%s folder:thread]
+          [%s folder:thread] ::should actually be tags, this is just placeholder
+          [%b read:thread]
       ==
       ::
       :-  %a

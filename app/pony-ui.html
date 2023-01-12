@@ -14,6 +14,72 @@
       overflow: hidden;
       background-color: white;
     }
+
+    #threads {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .toggle {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid lightgray;
+        border-radius: 4px;
+        background-color: white;
+        position: relative;
+        width: 30%;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+    .toggle-title {
+        font-size: 16px;
+        padding-right: 20px;
+        width: fit-content;
+        background: none;
+        border: none;
+    }
+    .toggle::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 7px solid gray;
+    }
+    .toggle.show::before {
+        transform: translateY(-50%) rotate(180deg);
+        border-top: none;
+        border-bottom: 7px solid gray;
+    }
+    .toggle ul {
+        display: none;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+    .toggle.show ul {
+        display: block;
+    }
+    .toggle ul li {
+        padding: 10px;
+    }
+    .toggle.unread {
+        background-color: #f9f9f9;
+        color: #333333;
+    }
+    .toggle.unread .toggle-title {
+        color: #333333;
+    }
+    .toggle.unread .toggle-title {
+        font-weight: bold; /* make the text bold */
+        color: #333333; /* change the text color */
+    }
+        
   </style>
   <title>Pony</title>
 </head>
@@ -61,11 +127,20 @@ async function getState() {
     return response.json()
 }
 
+var idi = 0;
+var titlei = 1;
+var hosti = 2;
+var messagesi = 3;
+var participantsi = 4;
+var voyeursi = 5;
+var folderi = 6;
+var tagsi = 7;
+var readi = 8;
+
 
 function postNewThread()
 {
-    //If participants or voyeurs is blank, you should still be able to post
-    //the thread. This will handle both the case where the user correctly
+    //This will handle both the case where the user correctly
     //formats the (list @p) and the case where the user correctly leaves the box
     //blank. TODO: The frontend should also disallow clicking the Create Thread button
     //unless these lists are formatted correctly in the first place.
@@ -102,42 +177,105 @@ for (i = 0; i < coll.length; i++) {
 
 function renderPage(state)
 {
+    console.log(state)
 
-    //Drafts
-    /*const drafts = document.getElementById("drafts");
+    const sortedState = state[0].reduce((acc, cur) => {
+        const folder = cur[folderi];
+        if (!acc[folder]) {
+            acc[folder] = [];
+        }
+        acc[folder].push(cur);
+        return acc;
+    }, {});
 
-    if(state[1].length > 0)
-    {
-      const headerDr = document.createElement("h3");
-      headerDr.textContent = "Drafts";
-      drafts.appendChild(headerDr);
+    for (const folder in sortedState) {
+        sortedState[folder].sort((a, b) => a[readi] - b[readi]);
     }
 
-    for(var i = 0; i < state[1].length; i++)
-    {
-        const draft = document.createElement("a");
-        draft.textContent = state[1][i][0];
-        draft.setAttribute('href', "pony/drafts/" + state[1][i][0]);
-        drafts.appendChild(draft);
-
-        drafts.appendChild(document.createElement("br"));
-        drafts.appendChild(document.createElement("br"));
-    }*/
-
     //Threads
-    const threads = document.getElementById("threads");
+    const toggleContainer = document.getElementById("threads");
 
-    for(var i = 0; i < state[0].length; i++)
+    for (const folder in sortedState) {
+        // create a container for each folder
+        const toggle = document.createElement("div");
+        toggle.classList.add('toggle');
+        
+        // create a toggle button
+        const button = document.createElement("button");
+        button.textContent = folder;
+        button.classList.add('toggle-title')
+        toggle.appendChild(button);
+
+        // check if folder contains any unread threads
+        let hasOne = false;
+        sortedState[folder].forEach(thread => {
+            if(!thread[readi]){
+                hasOne = true;
+            }
+        });
+        if(hasOne){
+            toggle.classList.add("unread");
+        }
+        
+        // add event listener for toggle
+        toggle.addEventListener("click", function(){
+            toggle.classList.toggle("show");
+        });
+        
+        // create container for the threads in the folder
+        const threadList = document.createElement("ul");
+        // create an item for each thread in the folder
+        sortedState[folder].forEach(thread => {
+            const threadItem = document.createElement("li");
+            const link = document.createElement("a");
+            link.textContent = thread[titlei];
+            link.href = "pony/" + thread[idi] + "/t";
+            if(!thread[readi])
+              link.style.fontWeight = 'bold';
+            threadItem.appendChild(link);
+            threadList.appendChild(threadItem);
+        });
+        
+        toggle.appendChild(threadList);
+        toggleContainer.appendChild(toggle);
+    }
+
+
+    /*for(var i = 0; i < state[0].length; i++)
     {
         const thread = document.createElement("a");
-        thread.textContent = state[0][i][1];
-        thread.setAttribute('href', "pony/" + state[0][i][0] + "/t");
+        thread.textContent = state[0][i][titlei];
+        thread.setAttribute('href', "pony/" + state[0][i][idi] + "/t");
         threads.appendChild(thread);
 
         threads.appendChild(document.createElement("br"));
         threads.appendChild(document.createElement("br"));
-    }
+    }*/
 }
 
+
+
+
+  //Drafts
+  /*const drafts = document.getElementById("drafts");
+
+  if(state[1].length > 0)
+  {
+    const headerDr = document.createElement("h3");
+    headerDr.textContent = "Drafts";
+    drafts.appendChild(headerDr);
+  }
+
+  for(var i = 0; i < state[1].length; i++)
+  {
+      const draft = document.createElement("a");
+      draft.textContent = state[1][i][0];
+      draft.setAttribute('href', "pony/drafts/" + state[1][i][0]);
+      drafts.appendChild(draft);
+
+      drafts.appendChild(document.createElement("br"));
+      drafts.appendChild(document.createElement("br"));
+  }*/
 </script>
 </main>
+
