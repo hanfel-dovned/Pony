@@ -14,6 +14,20 @@
       overflow: hidden;
       background-color: white;
     }
+
+    #new-folder-container {
+      display: inline-block;
+      margin-left: 10px;
+    }
+    #folder-select {
+      display: inline-block;
+      margin-left: 10px;
+    }
+    #select-folder-button {
+      display: inline-block;
+      margin-left: 10px;
+    }
+    
   </style>
   <title>Pony</title>
 </head>
@@ -35,6 +49,15 @@
         <br>
         <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
         <button onclick="postForkThread()">Fork Thread</button>
+    </div><br><br><br>
+    <div>
+      <select id="folder-select">
+        <option id="new-folder-option" value="new">New Folder</option>
+      </select>
+      <div id="new-folder-container" style="display: none;">
+        <input type="text" id="new-folder-input" placeholder="New Folder Name">
+      </div>
+      <button id="select-folder-button" onclick="postMoveToFolder()">Move to Folder</button>
     </div>
     <script>
     
@@ -49,6 +72,17 @@ function post(tag, data) {
 
 getState()
     .then((state) => renderPage(state))
+
+var idi = 0;
+var titlei = 1;
+var hosti = 2;
+var messagesi = 3;
+var participantsi = 4;
+var voyeursi = 5;
+var folderi = 6;
+var tagsi = 7;
+var readi = 8;
+
 
 async function getState() {
     const response = await fetch('/apps/pony/state')
@@ -93,6 +127,16 @@ function postForkThread()
 {
     post("fork-thread", [threadID, document.getElementById('participantBox').value.split(" "),
                                     document.getElementById('voyeurBox').value.split(" "),]);
+}
+
+function postMoveToFolder()
+{
+    let selectedFolder = document.getElementById('folder-select').value;
+    if (selectedFolder === 'new') {
+        selectedFolder = document.getElementById('new-folder-input').value;
+    }
+
+    post("move-to-folder", [threadID, selectedFolder]);
 }
 
 function renderPage(state)
@@ -142,6 +186,34 @@ function renderPage(state)
         messages.appendChild(document.createElement("br"));
         messages.appendChild(document.createElement("br"));
     }
+
+    const select = document.getElementById("folder-select");
+    const newFolderOption = document.getElementById("new-folder-option");
+    const newFolderContainer = document.getElementById("new-folder-container");
+    const newFolderInput = document.getElementById("new-folder-input");
+    const button = document.getElementById("select-folder-button");
+
+    // Extract the unique folders
+    let folders = state[0].map(f => f[folderi]).filter((folder, i, self) => self.indexOf(folder) === i);
+
+    // Populate the dropdown with options for each folder in state
+    folders.forEach((folder) => {
+      const option = document.createElement("option");
+      option.value = folder;
+      option.text = folder;
+      select.appendChild(option);
+    });
+
+    select.selectedIndex = 1; //skip the "New Folder" option at first
+
+    // Add an event listener to the select that shows/hides the text box when the "New Folder" option is selected
+    select.addEventListener("change", function(){
+        if(select.value === "new") {
+            newFolderContainer.style.display = "block";
+        }else{
+            newFolderContainer.style.display = "none";
+        }
+    });
 }
 
 </script>

@@ -179,6 +179,7 @@
         [%new-draft (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%fork-thread (at ~[(se %da) (ar (se %p)) (ar (se %p))])]
+        [%move-to-folder (at ~[(se %da) so])]
     ==
   ::
   ++  handle-action
