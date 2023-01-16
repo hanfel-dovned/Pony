@@ -110,6 +110,9 @@
     </div>
     <br>
     <h3>Threads</h3>
+    <input type="text" id="searchBox" placeholder = "tag or ~sampel-palnet">
+    <button type="button" onclick="search()">Search</button>
+    <br><br>
     <div id="threads"></div>
     <script>
     
@@ -139,6 +142,12 @@ var voyeursi = 5;
 var folderi = 6;
 var tagsi = 7;
 var readi = 8;
+
+function search() 
+{
+    var searchTerm = document.getElementById("searchBox").value;
+    window.location.href = "pony/search/" + searchTerm;
+}
 
 
 function postNewThread()
@@ -202,8 +211,6 @@ for (i = 0; i < coll.length; i++) {
 
 function renderPage(state)
 {
-    console.log(state)
-
     const sortedState = state[0].reduce((acc, cur) => {
         const folder = cur[folderi];
         if (!acc[folder]) {
@@ -254,7 +261,7 @@ function renderPage(state)
             const threadItem = document.createElement("li");
             const link = document.createElement("a");
             link.textContent = thread[titlei];
-            link.href = "pony/" + thread[idi] + "/t";
+            link.href = "/apps/pony/" + thread[idi] + "/t";
             if(!thread[readi])
               link.style.fontWeight = 'bold';
             threadItem.appendChild(link);

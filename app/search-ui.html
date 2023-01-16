@@ -1,0 +1,148 @@
+<head>
+  <style>
+    body { 
+      background-color: white; 
+      font-family: "arial"; 
+      text-align: center;
+      border-radius: 5;
+      color: black;
+    }
+
+    .content {
+      padding: 18px;
+      display: none;
+      overflow: hidden;
+      background-color: white;
+    }
+
+    #threads {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .toggle {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid lightgray;
+        border-radius: 4px;
+        background-color: white;
+        position: relative;
+        width: 600px;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+    .toggle-title {
+        font-size: 16px;
+        padding-right: 20px;
+        width: fit-content;
+        background: none;
+        border: none;
+    }
+    .toggle::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 7px solid gray;
+    }
+    .toggle.show::before {
+        transform: translateY(-50%) rotate(180deg);
+        border-top: none;
+        border-bottom: 7px solid gray;
+    }
+    .toggle ul {
+        display: none;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+    .toggle.show ul {
+        display: block;
+    }
+    .toggle ul li {
+        padding: 10px;
+    }
+    .toggle.unread {
+        background-color: #f9f9f9;
+        color: #333333;
+    }
+    .toggle.unread .toggle-title {
+        color: #333333;
+    }
+    .toggle.unread .toggle-title {
+        font-weight: bold; /* make the text bold */
+        color: #333333; /* change the text color */
+    }
+        
+  </style>
+  <title>Pony</title>
+</head>
+
+<body>
+  <main>
+    <h1>threads</h1>
+    <div id="threads"></div>
+    <script>
+    
+
+function post(tag, data) {
+    fetch('/apps/pony', {
+        method: 'POST',
+        body: JSON.stringify({[tag]: data})
+    })
+    location.reload()
+}
+
+getState()
+    .then((state) => renderPage(state))
+
+async function getState() {
+    const response = await fetch('/apps/pony/state')
+    return response.json()
+}
+
+var idi = 0;
+var titlei = 1;
+var hosti = 2;
+var messagesi = 3;
+var participantsi = 4;
+var voyeursi = 5;
+var folderi = 6;
+var tagsi = 7;
+var readi = 8;
+
+var searchTerm = window.location.href.split("/")
+searchTerm = searchTerm[searchTerm.length - 1]
+
+function renderPage(state)
+{
+    const threads = document.getElementById("threads");
+
+    var searchedState = []
+    if(Array.from(searchTerm)[0] == "~")
+      searchedState = state[0].filter(thread => thread[participantsi].includes(searchTerm));
+    else
+      searchedState = state[0].filter(thread => thread[tagsi].includes(searchTerm));
+
+    //Threads
+    for(i = 0; i < searchedState.length; i++) {
+      const link = document.createElement("a");
+      link.textContent = searchedState[i][titlei];
+      link.href = "/apps/pony/" + searchedState[i][idi] + "/t";
+      if(!searchedState[i][readi])
+        link.style.fontWeight = 'bold';
+      threads.appendChild(link);
+      threads.appendChild(document.createElement("br"));
+    }
+}
+
+
+</script>
+</main>

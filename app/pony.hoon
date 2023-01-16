@@ -2,7 +2,7 @@
 /+  dbug, default-agent, server, schooner
 /*  pony-ui     %html  /app/pony-ui/html
 /*  thread-ui   %html  /app/thread-ui/html
-/*  draft-ui    %html  /app/draft-ui/html
+/*  search-ui    %html  /app/search-ui/html
 |%
 +$  versioned-state
   $%  state-0
@@ -79,7 +79,6 @@
       ?~  body.request.inbound-request
         [(send [405 ~ [%stock ~]]) state]
       =/  json  (de-json:html q.u.body.request.inbound-request)
-      ~&  json
       =/  action  (dejs-action +.json)
       (handle-action action)
       ::
@@ -102,6 +101,10 @@
         =/  newt  oldt(read %.y)
         :_  state(threads (~(put by threads) id newt))
         (send [200 ~ [%html thread-ui]])
+          ::
+          [%apps %pony %search @ ~]
+        :_  state
+        (send [200 ~ [%html search-ui]])
       == 
     ==
   ::
