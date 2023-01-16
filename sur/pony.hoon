@@ -1,8 +1,8 @@
 |%
 +$  id  @da
 +$  message  [date=@da text=@t sender=@p]
-+$  participants  (list @p)
-+$  voyeurs  (list @p)
++$  participants  (set @p)
++$  voyeurs  (set @p)
 +$  thread  $:  title=@t
                 host=@p 
                 messages=(list message) 
@@ -15,6 +15,7 @@
 +$  threads  (map =id =thread)
 +$  draft  [title=@t text=@t =participants =voyeurs]
 +$  drafts  (list draft)
++$  scheduled  (map bday=@da =draft)
 +$  action
   $%  [%new-thread title=@t text=@t =participants =voyeurs]
       [%fork-thread =id =participants =voyeurs]
@@ -26,6 +27,7 @@
       [%move-to-folder =id folder=@t]
       [%add-tags =id tags=(set @t)]
       [%remove-tag =id tag=@t]
+      [%schedule-send wait=@dr =draft]
   ==
 +$  update
   $%  [%thread =id =thread]

@@ -7,18 +7,16 @@
 +$  versioned-state
   $%  state-0
   ==
-+$  state-0  [%0 =threads =drafts]
++$  state-0  [%0 =threads =drafts =scheduled]
 +$  card  card:agent:gall
 --
 %-  agent:dbug
 ^-  agent:gall
 =|  state-0
 =*  state  -
-=<
 |_  =bowl:gall
 +*  this  .
     def  ~(. (default-agent this %.n) bowl)
-    hc    ~(. +> bowl)
 ++  on-init
   ^-  (quip card _this)
   :_  this
@@ -113,6 +111,7 @@
     |=  $:
             =^threads
             =^drafts
+            =^scheduled
         ==
     ^-  json
     :-  %a
@@ -138,11 +137,11 @@
           ==
           ::
           :-  %a
-          %+  turn  participants:thread
+          %+  turn  ~(tap in participants:thread)
           |=  part=@p  [%s (scot %p part)]
           ::
           :-  %a
-          %+  turn  voyeurs:thread
+          %+  turn  ~(tap in voyeurs:thread)
           |=  voy=@p  [%s (scot %p voy)]
           ::
           [%s folder:thread]
@@ -156,18 +155,18 @@
       ::
       :-  %a
       %+  turn  drafts
-      |=  [title=@t text=@t parts=(list @p) voys=(list @p)]
+      |=  [title=@t text=@t parts=(set @p) voys=(set @p)]
       :-  %a
       :~
           [%s title]
           [%s text]
           ::
           :-  %a
-          %+  turn  parts
+          %+  turn  ~(tap in parts)
           |=  part=@p  [%s (scot %p part)]
           ::
           :-  %a
-          %+  turn  voys
+          %+  turn  ~(tap in voys)
           |=  voy=@p  [%s (scot %p voy)]
       ==
     ==
@@ -180,10 +179,10 @@
     %-  of
     :~  [%add-ship (at ~[(se %da) (se %p)])]  
         [%new-message (at ~[(se %da) so])]
-        [%new-draft (at ~[so so (ar (se %p)) (ar (se %p))])]
-        [%delete-draft (at ~[so so (ar (se %p)) (ar (se %p))])]
-        [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
-        [%fork-thread (at ~[(se %da) (ar (se %p)) (ar (se %p))])]
+        [%new-draft (at ~[so so (as (se %p)) (as (se %p))])]
+        [%delete-draft (at ~[so so (as (se %p)) (as (se %p))])]
+        [%new-thread (at ~[so so (as (se %p)) (as (se %p))])]
+        [%fork-thread (at ~[(se %da) (as (se %p)) (as (se %p))])]
         [%move-to-folder (at ~[(se %da) so])]
         [%add-tags (at ~[(se %da) (as so)])]
         [%remove-tag (at ~[(se %da) so])]
@@ -202,7 +201,7 @@
         :*  title:action
             our.bowl
             ~[[now.bowl text:action our.bowl]]
-            (snoc participants:action our.bowl)
+            (~(put in participants:action) our.bowl)
             voyeurs:action
             'Threads'
             ~
@@ -210,7 +209,7 @@
         ==
       :_  state(threads (~(put by threads) now.bowl newt))
       =-  -.-
-      %^  spin  (weld participants:action voyeurs:action)
+      %^  spin  ~(tap in (~(uni in participants:action) voyeurs:action))
           now.bowl
       |=  [=ship id=@da]
       :_  id
@@ -230,7 +229,7 @@
         %=  oldt
           title  (crip (weld (trip title:oldt) " [fork]"))
           host  our.bowl
-          participants  (snoc participants:action our.bowl)
+          participants  (~(put in participants:action) our.bowl)
           voyeurs  voyeurs:action
           folder  'Threads'
           tags  ~
@@ -238,7 +237,7 @@
         ==
       :_  state(threads (~(put by threads) now.bowl newt))
       =-  -.-
-      %^  spin  (weld participants:action voyeurs:action)
+      %^  spin  ~(tap in (~(uni in participants:action) voyeurs:action))
           now.bowl
       |=  [=ship id=@da]
       :_  id
@@ -264,29 +263,23 @@
             ==
         ==
       ::
-      ?>  (is-member participants:oldt src.bowl)
-      ?<  (is-member participants:oldt ship:action)
+      ?>  (~(has in participants:oldt) src.bowl)
+      ?<  (~(has in participants:oldt) ship:action)
       =/  newparticipants
-          (snoc participants:oldt ship:action)
+          (~(put in participants:oldt) ship:action)
       =/  newt
         ^-  thread
         %=  oldt
           ::  If this came from a voyeur, reveal them
           participants  
-            ?.  (is-member voyeurs:oldt src.bowl)
+            ?.  (~(has in voyeurs:oldt) src.bowl)
               newparticipants
-            (snoc newparticipants src.bowl)
+            (~(put in newparticipants) src.bowl)
           ::
           voyeurs
-            ?.  (is-member voyeurs:oldt src.bowl)
+            ?.  (~(has in voyeurs:oldt) src.bowl)
               voyeurs:oldt
-            %+  oust
-              :-  =<  +
-                  %+  find  
-                    ~[src.bowl]
-                  voyeurs:oldt
-              1
-            voyeurs:oldt
+            (~(del in voyeurs:oldt) src.bowl)
         ==
       :_  state(threads (~(put by threads) id:action newt))
       :~  :*  %pass  /invites  %agent
@@ -326,8 +319,8 @@
             ==
         ==
         ::
-      ?>  ?|  (is-member participants:oldt src.bowl)
-              (is-member voyeurs:oldt src.bowl)
+      ?>  ?|  (~(has in participants:oldt) src.bowl)
+              (~(has in voyeurs:oldt) src.bowl)
           ==
       =/  newmessage
         :+  now.bowl
@@ -339,20 +332,14 @@
           messages  (snoc messages:oldt newmessage)
           ::  If this came from a voyeur, reveal them
           participants
-            ?.  (is-member voyeurs:oldt src.bowl)
+            ?.  (~(has in voyeurs:oldt) src.bowl)
               participants:oldt
-            (snoc participants:oldt src.bowl)
+            (~(put in participants:oldt) src.bowl)
           ::
           voyeurs
-            ?.  (is-member voyeurs:oldt src.bowl)
+            ?.  (~(has in voyeurs:oldt) src.bowl)
               voyeurs:oldt
-            %+  oust
-              :-  =<  +
-                  %+  find  
-                    ~[src.bowl]
-                  voyeurs:oldt
-              1
-            voyeurs:oldt
+            (~(del in voyeurs:oldt) src.bowl)
         ==
       :_  state(threads (~(put by threads) id:action newt))
       :~  :*  %give  %fact  ~[/(scot %da id:action)]
@@ -407,6 +394,13 @@
           tags  (~(del in tags:oldt) tag:action)
         ==
       `state(threads (~(put by threads) id:action newt))
+    ::
+    ::  Use Behn to schedule a new-thread poke.
+        %schedule-send
+      ?>  =(src.bowl our.bowl)
+      :_  state(scheduled (~(put by scheduled) now.bowl draft:action))
+      :~  [%pass /timers/(scot %da now.bowl) %arvo %b %wait (add now.bowl wait:action)]
+      ==
     ==
   --
 ++  on-peek  on-peek:def
@@ -423,8 +417,8 @@
     =/  th
         ^-  thread  
         (~(got by threads) theid)
-    ?>  ?|  (is-member participants:th src.bowl)
-            (is-member voyeurs:th src.bowl)
+    ?>  ?|  (~(has in participants:th) src.bowl)
+            (~(has in voyeurs:th) src.bowl)
         ==
     :_  this
     :~  :*  %give  %fact  ~
@@ -477,26 +471,17 @@
     ==
   ==
 ::
-++  on-arvo  on-arvo:def
+++  on-arvo
+  |=  [=wire =sign-arvo]
+  ^-  (quip card _this)
+  ?+    wire  (on-arvo:def wire sign-arvo)
+      [%timers @ ~]
+    ?+    sign-arvo  (on-arvo:def wire sign-arvo)
+        [%behn %wake *]
+      ~&  wire
+      `this
+    ==
+  ==
+::  
 ++  on-fail  on-fail:def
---
-::
-|_  bowl:gall
-::++  find-thread
-::  |=  =id
-::  ^-  thread
-::  %+  snag  0
-::  %+  skim  threads
-::  |=  t=thread
-::  =(-.t id)
-::
-++  is-member
-  |=  [members=(list @p) who=@p]
-  ^-  ?
-  =+  %+  skim  members
-      |=  m=@p
-      =(m who)
-  ?~  -
-    %.n
-  %.y
 --
