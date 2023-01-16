@@ -478,8 +478,13 @@
       [%timers @ ~]
     ?+    sign-arvo  (on-arvo:def wire sign-arvo)
         [%behn %wake *]
-      ~&  wire
-      `this
+      =/  ndraft  (~(get by scheduled) (slav %da +6:wire))
+      :_  this(scheduled (~(del by scheduled) (slav %da +6:wire)))
+      :~  :*  %pass  /new-thread
+              %agent  [our.bowl %pony]
+              %poke  %pony-action
+              !>([%new-thread ndraft])
+      ==  ==
     ==
   ==
 ::  
