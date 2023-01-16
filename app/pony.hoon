@@ -101,10 +101,6 @@
         =/  newt  oldt(read %.y)
         :_  state(threads (~(put by threads) id newt))
         (send [200 ~ [%html thread-ui]])
-          ::
-        ::    [%apps %pony %drafts @da ~]
-        ::  :_  state
-        ::  (send [200 ~ [%html draft-ui]])
       == 
     ==
   ::
