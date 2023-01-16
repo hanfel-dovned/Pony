@@ -24,7 +24,7 @@
       [%new-draft =draft]
       [%delete-draft =draft]
       [%move-to-folder =id folder=@t]
-      [%add-tag =id tag=@t]
+      [%add-tags =id tags=(set @t)]
       [%remove-tag =id tag=@t]
   ==
 +$  update

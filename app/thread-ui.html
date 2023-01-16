@@ -27,7 +27,7 @@
       display: inline-block;
       margin-left: 10px;
     }
-    
+
   </style>
   <title>Pony</title>
 </head>
@@ -36,20 +36,9 @@
   <main>
     <div id="messages"></div>
     <textarea id="messageBox" rows="10" cols="50"></textarea><br><br>
-    <button onclick="postNewMessage()">Post</button>   
-    <button onclick="postNewDraft()">Save Draft</button><br><br><br>
+    <button onclick="postNewMessage()">Post</button><br><br><br>
     <input type="text" id="addShipBox" placeholder="~sampel-palnet">
-    <button onclick="postAddShip()">Add Ship to Thread</button><br><br><br>
-    <button type="button" class="collapsible">Fork Thread</button>
-    <div class="content">
-        <label for="PublicParticipants">Public Participants</label>
-        <br>
-        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
-        <label for="SecretParticipants">Secret Participants</label>
-        <br>
-        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
-        <button onclick="postForkThread()">Fork Thread</button>
-    </div><br><br><br>
+    <button onclick="postAddShip()">Invite Ship to Thread</button><br><br><br>
     <div>
       <select id="folder-select">
         <option id="new-folder-option" value="new">New Folder</option>
@@ -58,6 +47,16 @@
         <input type="text" id="new-folder-input" placeholder="New Folder Name">
       </div>
       <button id="select-folder-button" onclick="postMoveToFolder()">Move to Folder</button>
+    </div><br><br>
+    <button type="button" class="collapsible">Fork Thread</button>
+    <div class="content">
+        <label for="PublicParticipants">Public Participants</label>
+        <br>
+        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <label for="SecretParticipants">Secret Participants</label>
+        <br>
+        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <button onclick="postForkThread()">Fork</button>
     </div>
     <script>
     
@@ -129,6 +128,16 @@ function postForkThread()
                                     document.getElementById('voyeurBox').value.split(" "),]);
 }
 
+function postAddTags()
+{
+    post("add-tags", [threadID, document.getElementById('addTagsBox').value.split(" ")]);
+}
+
+function postRemoveTag(tag)
+{
+    post("remove-tag", [threadID, tag]);
+}
+
 function postMoveToFolder()
 {
     let selectedFolder = document.getElementById('folder-select').value;
@@ -147,14 +156,15 @@ function renderPage(state)
     const threadIndex = state[0].findIndex(x => x[0] == threadID)
 
     const title = document.createElement("h2");
-    title.textContent = state[0][threadIndex][1];
+    title.textContent = state[0][threadIndex][titlei];
     messages.appendChild(title);
 
+    //Participants
     const partHeader = document.createElement("a");
     partHeader.textContent = "Participants: ";
     messages.appendChild(partHeader);
 
-    for(var i = 0; i < state[0][threadIndex][4].length; i++)
+    for(var i = 0; i < state[0][threadIndex][participantsi].length; i++)
     {
         const participant = document.createElement("a");
         participant.textContent = state[0][threadIndex][4][i] + " ";
@@ -165,6 +175,43 @@ function renderPage(state)
     messages.appendChild(document.createElement("br"));
     messages.appendChild(document.createElement("br"));
 
+    //Tags
+    const addTagsTextbox = document.createElement("input");
+    addTagsTextbox.setAttribute("type", "text");
+    addTagsTextbox.setAttribute("placeholder", "tag-one tag-two");
+    addTagsTextbox.setAttribute("id", "addTagsBox");
+
+    const addTagsButton = document.createElement("button");
+    addTagsButton.textContent = "Add Tags";
+    addTagsButton.addEventListener("click", postAddTags);
+
+    messages.appendChild(addTagsTextbox);
+    messages.appendChild(addTagsButton);
+    messages.appendChild(document.createElement("br"));
+    messages.appendChild(document.createElement("br"));
+
+    for(var i = 0; i < state[0][threadIndex][tagsi].length; i++)
+    {
+        const tag = document.createElement("a");
+        tag.textContent = state[0][threadIndex][tagsi][i] + " ";
+        messages.appendChild(tag);
+
+        // delete button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "X";
+        deleteBtn.setAttribute("onClick", `postRemoveTag(${JSON.stringify(state[0][threadIndex][tagsi][i])})`);
+        messages.appendChild(document.createTextNode(" "));
+        messages.appendChild(deleteBtn);
+        messages.appendChild(document.createTextNode(" "));
+    }
+
+
+    messages.appendChild(document.createElement("br"));
+    messages.appendChild(document.createElement("br"));
+    messages.appendChild(document.createElement("br"));
+    
+
+    //Messages
     for(var i = 0; i < state[0][threadIndex][3].length; i++)
     {
         

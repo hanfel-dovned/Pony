@@ -81,7 +81,6 @@
       =/  json  (de-json:html q.u.body.request.inbound-request)
       ~&  json
       =/  action  (dejs-action +.json)
-      ~&  "parsed"
       (handle-action action)
       ::
         %'GET'
@@ -144,7 +143,11 @@
           |=  voy=@p  [%s (scot %p voy)]
           ::
           [%s folder:thread]
-          [%s folder:thread] ::should actually be tags, this is just placeholder
+          ::
+          :-  %a
+          %+  turn  ~(tap in tags:thread)
+          |=  tag=@t  [%s tag]
+          ::
           [%b read:thread]
       ==
       ::
@@ -179,6 +182,8 @@
         [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%fork-thread (at ~[(se %da) (ar (se %p)) (ar (se %p))])]
         [%move-to-folder (at ~[(se %da) so])]
+        [%add-tags (at ~[(se %da) (as so)])]
+        [%remove-tag (at ~[(se %da) so])]
     ==
   ::
   ++  handle-action
@@ -362,8 +367,6 @@
         %delete-draft
       ?>  =(src.bowl our.bowl)
       =/  i  (find ~[draft:action] drafts)
-      ~&  i
-      ~&  +.i
       `state(drafts (oust [+.i 1] drafts))
     ::
     ::  Change a thread's folder.
@@ -378,15 +381,15 @@
         ==
       `state(threads (~(put by threads) id:action newt))
     ::
-    ::  Add a tag to a thread.
-        %add-tag
+    ::  Add tags to a thread.
+        %add-tags
       ?>  =(src.bowl our.bowl)
       =/  oldt  
         ^-  thread  
         (~(got by threads) id:action)
       =/  newt
         %=  oldt
-          tags  (~(put in tags:oldt) tag:action)
+          tags  (~(uni in tags:oldt) tags:action)
         ==
       `state(threads (~(put by threads) id:action newt))
     ::
