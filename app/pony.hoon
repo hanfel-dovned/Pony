@@ -79,7 +79,9 @@
       ?~  body.request.inbound-request
         [(send [405 ~ [%stock ~]]) state]
       =/  json  (de-json:html q.u.body.request.inbound-request)
+      ~&  json
       =/  action  (dejs-action +.json)
+      ~&  "parsed"
       (handle-action action)
       ::
         %'GET'
@@ -173,6 +175,7 @@
     :~  [%add-ship (at ~[(se %da) (se %p)])]  
         [%new-message (at ~[(se %da) so])]
         [%new-draft (at ~[so so (ar (se %p)) (ar (se %p))])]
+        [%delete-draft (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%new-thread (at ~[so so (ar (se %p)) (ar (se %p))])]
         [%fork-thread (at ~[(se %da) (ar (se %p)) (ar (se %p))])]
         [%move-to-folder (at ~[(se %da) so])]
@@ -359,7 +362,9 @@
         %delete-draft
       ?>  =(src.bowl our.bowl)
       =/  i  (find ~[draft:action] drafts)
-      `state(drafts (oust [+.i 0] drafts))
+      ~&  i
+      ~&  +.i
+      `state(drafts (oust [+.i 1] drafts))
     ::
     ::  Change a thread's folder.
         %move-to-folder

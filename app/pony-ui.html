@@ -91,6 +91,7 @@
     <button type="button" class="collapsible">New Thread</button>
     <div class="content">
         <div id="drafts"></div>
+        <br>
         <label for="Title">Title</label>
         <br>
         <input type="text" id="titleBox" size="50"><br><br>
@@ -174,6 +175,11 @@ function postSaveDraft()
                         document.getElementById('messageBox').value,
                         participants,
                         voyeurs,]);
+}
+
+function postDeleteDraft(draft)
+{
+    post("delete-draft", [draft[0], draft[1], draft[2], draft[3]]);
 }
 
 
@@ -286,6 +292,13 @@ function renderPage(state)
         draft.textContent = state[1][i][0];
         draft.setAttribute('href', "javascript:void(0)");
         drafts.appendChild(draft);
+
+        // create a delete button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "X";
+        deleteBtn.setAttribute("onClick", `postDeleteDraft(${JSON.stringify(state[1][i])})`);
+        drafts.appendChild(document.createTextNode(" ")); // add a space
+        drafts.appendChild(deleteBtn);
 
         drafts.appendChild(document.createElement("br"));
         drafts.appendChild(document.createElement("br"));
