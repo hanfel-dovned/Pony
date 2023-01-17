@@ -16,6 +16,7 @@
 +$  draft  [title=@t text=@t =participants =voyeurs]
 +$  drafts  (list draft)
 +$  scheduled  (map bday=@da =draft)
++$  mypals  (set @p)
 +$  action
   $%  [%new-thread title=@t text=@t =participants =voyeurs]
       [%fork-thread =id =participants =voyeurs]
@@ -27,7 +28,7 @@
       [%move-to-folder =id folder=@t]
       [%add-tags =id tags=(set @t)]
       [%remove-tag =id tag=@t]
-      [%schedule-send wait=@dr =draft]
+      [%schedule-send when=@da =draft]
   ==
 +$  update
   $%  [%thread =id =thread]

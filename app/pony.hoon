@@ -1,4 +1,4 @@
-/-  *pony
+/-  *pony, pals
 /+  dbug, default-agent, server, schooner
 /*  pony-ui     %html  /app/pony-ui/html
 /*  thread-ui   %html  /app/thread-ui/html
@@ -7,7 +7,7 @@
 +$  versioned-state
   $%  state-0
   ==
-+$  state-0  [%0 =threads =drafts =scheduled]
++$  state-0  [%0 =threads =drafts =scheduled =mypals]
 +$  card  card:agent:gall
 --
 %-  agent:dbug
@@ -21,6 +21,9 @@
   ^-  (quip card _this)
   :_  this
   :~
+    :*  %pass  /newpals  %agent
+        [our.bowl %pals]  %watch  /targets
+    ==  
     :*  %pass  /eyre/connect  %arvo  %e
         %connect  `/apps/pony  %pony
     ==
@@ -112,6 +115,7 @@
             =^threads
             =^drafts
             =^scheduled
+            =^mypals
         ==
     ^-  json
     :-  %a
@@ -169,6 +173,11 @@
           %+  turn  ~(tap in voys)
           |=  voy=@p  [%s (scot %p voy)]
       ==
+      ::
+      :-  %a
+      %+  turn  ~(tap in mypals)
+      |=  pal=@p
+      [%s (scot %p pal)]
     ==
   ::
   ++  dejs-action
@@ -186,6 +195,7 @@
         [%move-to-folder (at ~[(se %da) so])]
         [%add-tags (at ~[(se %da) (as so)])]
         [%remove-tag (at ~[(se %da) so])]
+        [%schedule-send (at ~[(se %da) so so (as (se %p)) (as (se %p))])]
     ==
   ::
   ++  handle-action
@@ -399,7 +409,7 @@
         %schedule-send
       ?>  =(src.bowl our.bowl)
       :_  state(scheduled (~(put by scheduled) now.bowl draft:action))
-      :~  [%pass /timers/(scot %da now.bowl) %arvo %b %wait (add now.bowl wait:action)]
+      :~  [%pass /timers/(scot %da now.bowl) %arvo %b %wait when:action]
       ==
     ==
   --
@@ -433,6 +443,21 @@
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
   ?+    wire  (on-agent:def wire sign)
+      [%newpals ~]
+    ?+    -.sign  (on-agent:def wire sign)
+        %fact
+      ?+    p.cage.sign  (on-agent:def wire sign)
+          %pals-effect
+        =/  neweffect  !<(effect:pals q.cage.sign)
+        ?+    -.neweffect  (on-agent:def wire sign)
+            %meet
+          `this(mypals (~(put in mypals) +.neweffect))
+            %part
+          `this(mypals (~(del in mypals) +.neweffect))
+        ==
+      ==
+    ==
+    ::
       [%updates @ ~]
     ?+    -.sign  (on-agent:def wire sign)
         %fact
@@ -474,11 +499,15 @@
 ++  on-arvo
   |=  [=wire =sign-arvo]
   ^-  (quip card _this)
+  ~&  'go on-arvo'
   ?+    wire  (on-arvo:def wire sign-arvo)
       [%timers @ ~]
+    ~&  'on timers/@'
     ?+    sign-arvo  (on-arvo:def wire sign-arvo)
         [%behn %wake *]
+      ~&  'behn/wake'
       =/  ndraft  (~(get by scheduled) (slav %da +6:wire))
+      ~&  (slav %da +6:wire)
       :_  this(scheduled (~(del by scheduled) (slav %da +6:wire)))
       :~  :*  %pass  /new-thread
               %agent  [our.bowl %pony]

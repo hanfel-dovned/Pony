@@ -99,12 +99,14 @@
         <textarea id="messageBox" rows="10" cols="50"></textarea><br><br>
         <label for="PublicParticipants">Public Participants</label>
         <br>
-        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
         <label for="SecretParticipants">Secret Participants</label>
         <br>
-        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
         <button onclick="postNewThread()">Create Thread</button>
-        <button onclick="postSaveDraft()">Save Draft</button>
+        <button onclick="postSaveDraft()">Save Draft</button><br><br>
+        <input type="datetime-local" id="dateBox">
+        <button onclick="postScheduleSend()">Schedule Thread</button>
         <br><br>
         <div id="drafts"></div>
     </div>
@@ -142,6 +144,7 @@ var voyeursi = 5;
 var folderi = 6;
 var tagsi = 7;
 var readi = 8;
+
 
 function search() 
 {
@@ -190,6 +193,42 @@ function postSaveDraft()
 function postDeleteDraft(draft)
 {
     post("delete-draft", [draft[0], draft[1], draft[2], draft[3]]);
+}
+
+//from urbit/api
+function dateToDa(d, mil) {
+  const fil = function (n) {
+    return n >= 10 ? n : "0" + n;
+  };
+  return (
+    `~${d.getUTCFullYear()}.` +
+    `${d.getUTCMonth() + 1}.` +
+    `${fil(d.getUTCDate())}..` +
+    `${fil(d.getUTCHours())}.` +
+    `${fil(d.getUTCMinutes())}.` +
+    `${fil(d.getUTCSeconds())}` +
+    `${mil ? "..0000" : ""}`
+  );
+}
+
+function postScheduleSend()
+{
+
+    var participants = document.getElementById('participantBox').value.split(" ")
+    if(participants[0] == [''])
+      participants = []
+
+    var voyeurs = document.getElementById('voyeurBox').value.split(" ")
+    if(voyeurs[0] == [''])
+      voyeurs = []
+
+    console.log(document.getElementById('dateBox').value)
+
+    post("schedule-send", [dateToDa(new Date(document.getElementById('dateBox').value)),
+                        document.getElementById('titleBox').value, 
+                        document.getElementById('messageBox').value,
+                        participants,
+                        voyeurs,]);
 }
 
 
@@ -271,18 +310,6 @@ function renderPage(state)
         toggle.appendChild(threadList);
         toggleContainer.appendChild(toggle);
     }
-
-
-    /*for(var i = 0; i < state[0].length; i++)
-    {
-        const thread = document.createElement("a");
-        thread.textContent = state[0][i][titlei];
-        thread.setAttribute('href', "pony/" + state[0][i][idi] + "/t");
-        threads.appendChild(thread);
-
-        threads.appendChild(document.createElement("br"));
-        threads.appendChild(document.createElement("br"));
-    }*/
 
 
     //Drafts

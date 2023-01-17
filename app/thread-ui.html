@@ -1,11 +1,13 @@
 <head>
   <style>
-    body { 
-      background-color: white; 
-      font-family: "arial"; 
+    body {
+      background-color: #e9e9e9;
+      justify-content: center;
       text-align: center;
-      border-radius: 5;
-      color: black;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: "arial"; 
     }
 
     .content {
@@ -28,35 +30,155 @@
       margin-left: 10px;
     }
 
+    #title {
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #participants {
+      font-size: 0.9em;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #666;
+    }
+
+    #tags {
+      font-size: 0.9em;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #666;
+    }
+
+    
+
+  #messages {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      flex-grow:1;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      overflow:auto;
+  }
+
+  .message {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 20px;
+      background-color: #f7f7f7;
+      border-radius: 5px;
+      box-shadow: 1px 1px 3px #ccc;
+  }
+
+  .message-text {
+      font-size: 1.2em;
+      line-height: 1.5em;
+  }
+
+  .message-author {
+      font-weight: bold;
+      font-size: 0.9em;
+      color: #3c3c3c;
+      margin-right: 10px;
+  }
+
+  .message-date {
+      font-size: 0.8em;
+      color: #999;
+  }
+
+  #messageBox {
+      width: 45%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+  }
+
+  .send-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+  }
+
+  .send-button:hover {
+      background-color: #3e8e41;
+  }
+
+  .small-text-input {
+      width: 20%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+  }
+
+  #folder-select {
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      padding: 8px;
+      font-size: 0.9em;
+      margin-right: 10px;
+      box-shadow: 1px 1px 3px #ccc;
+    }
+
+    #new-folder-container {
+      display: none;
+      margin-left: 10px;
+    }
+
+    #new-folder-input {
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      padding: 8px;
+      font-size: 0.9em;
+      margin-right: 10px;
+      box-shadow: 1px 1px 3px #ccc;
+    }
+
+    
+
   </style>
   <title>Pony</title>
 </head>
 
 <body>
   <main>
+    <div id="title"></div>
+    <div id="participants"></div>
+    <div id="tags"></div>
     <div id="messages"></div>
     <textarea id="messageBox" rows="10" cols="50"></textarea><br><br>
-    <button onclick="postNewMessage()">Post</button><br><br><br>
-    <input type="text" id="addShipBox" placeholder="~sampel-palnet">
-    <button onclick="postAddShip()">Invite Ship to Thread</button><br><br><br>
+    <button class="send-button" onclick="postNewMessage()">Post</button><br><br><br>
+    <input type="text" class="small-text-input" id="addShipBox" placeholder="~sampel-palnet">
+    <button class="send-button" onclick="postAddShip()">Invite Ship to Thread</button><br><br><br>
     <div>
       <select id="folder-select">
         <option id="new-folder-option" value="new">New Folder</option>
       </select>
       <div id="new-folder-container" style="display: none;">
-        <input type="text" id="new-folder-input" placeholder="New Folder Name">
+        <input type="text" class="small-text-input" id="new-folder-input" placeholder="New Folder Name">
       </div>
-      <button id="select-folder-button" onclick="postMoveToFolder()">Move to Folder</button>
+      <button class="send-button" id="select-folder-button" onclick="postMoveToFolder()">Move to Folder</button>
     </div><br><br>
     <button type="button" class="collapsible">Fork Thread</button>
     <div class="content">
         <label for="PublicParticipants">Public Participants</label>
         <br>
-        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
+        <input type="text" class="small-text-input" id="participantBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
         <label for="SecretParticipants">Secret Participants</label>
         <br>
-        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~hanfel-dovned"><br><br>
-        <button onclick="postForkThread()">Fork</button>
+        <input type="text" class="small-text-input" id="voyeurBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
+        <button class="send-button" onclick="postForkThread()">Fork</button>
     </div>
     <script>
     
@@ -150,33 +272,35 @@ function postMoveToFolder()
 
 function renderPage(state)
 {
-    //Add messages to page.
-    const messages = document.getElementById("messages");
+    //Title
+    const title = document.getElementById("title");
 
     const threadIndex = state[0].findIndex(x => x[0] == threadID)
 
-    const title = document.createElement("h2");
-    title.textContent = state[0][threadIndex][titlei];
-    messages.appendChild(title);
+    const titleText = document.createElement("h2");
+    titleText.textContent = state[0][threadIndex][titlei];
+    title.appendChild(titleText);
 
     //Participants
+    const participants = document.getElementById("participants");
+
     const partHeader = document.createElement("a");
     partHeader.textContent = "Participants: ";
-    messages.appendChild(partHeader);
+    participants.appendChild(partHeader);
 
     for(var i = 0; i < state[0][threadIndex][participantsi].length; i++)
     {
         const participant = document.createElement("a");
         participant.textContent = state[0][threadIndex][4][i] + " ";
-        messages.appendChild(participant);
+        participants.appendChild(participant);
     }
 
-    messages.appendChild(document.createElement("br"));
-    messages.appendChild(document.createElement("br"));
-    messages.appendChild(document.createElement("br"));
 
     //Tags
+    const tags = document.getElementById("tags");
+
     const addTagsTextbox = document.createElement("input");
+    addTagsTextbox.classList.add("small-text-input");
     addTagsTextbox.setAttribute("type", "text");
     addTagsTextbox.setAttribute("placeholder", "tag-one tag-two");
     addTagsTextbox.setAttribute("id", "addTagsBox");
@@ -185,53 +309,50 @@ function renderPage(state)
     addTagsButton.textContent = "Add Tags";
     addTagsButton.addEventListener("click", postAddTags);
 
-    messages.appendChild(addTagsTextbox);
-    messages.appendChild(addTagsButton);
-    messages.appendChild(document.createElement("br"));
-    messages.appendChild(document.createElement("br"));
+    tags.appendChild(addTagsTextbox);
+    tags.appendChild(addTagsButton);
+    tags.appendChild(document.createElement("br"));
 
     for(var i = 0; i < state[0][threadIndex][tagsi].length; i++)
     {
         const tag = document.createElement("a");
         tag.textContent = state[0][threadIndex][tagsi][i] + " ";
-        messages.appendChild(tag);
+        tags.appendChild(tag);
 
         // delete button
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "X";
         deleteBtn.setAttribute("onClick", `postRemoveTag(${JSON.stringify(state[0][threadIndex][tagsi][i])})`);
-        messages.appendChild(document.createTextNode(" "));
-        messages.appendChild(deleteBtn);
-        messages.appendChild(document.createTextNode(" "));
+        tags.appendChild(document.createTextNode(" "));
+        tags.appendChild(deleteBtn);
+        tags.appendChild(document.createTextNode(" "));
     }
-
-
-    messages.appendChild(document.createElement("br"));
-    messages.appendChild(document.createElement("br"));
-    messages.appendChild(document.createElement("br"));
     
 
     //Messages
+    const messages = document.getElementById("messages");
+
     for(var i = 0; i < state[0][threadIndex][3].length; i++)
-    {
-        
+    { 
         const message = document.createElement("a");
-        message.textContent = state[0][threadIndex][3][i][1];
-        messages.appendChild(message);
-        messages.appendChild(document.createElement("br"));
-        messages.appendChild(document.createElement("br"));
+        message.classList.add("message");
+
+        const text = document.createElement("p");
+        text.classList.add("message-text");
+        text.textContent = state[0][threadIndex][3][i][1];
+        message.appendChild(text);
 
         const author = document.createElement("a");
-        author.textContent = state[0][threadIndex][3][i][2] + " - ";
-        messages.appendChild(author);
+        author.classList.add("message-author");
+        author.textContent = state[0][threadIndex][3][i][2];
+        message.appendChild(author);
 
         const date = document.createElement("a");
-        date.textContent = state[0][threadIndex][3][i][0];
-        messages.appendChild(date);
+        date.classList.add("message-date");
+        date.textContent = state[0][threadIndex][3][i][0].replace(/\.\.\w+$/, ""); //strip seconds
+        message.appendChild(date);
 
-        messages.appendChild(document.createElement("br"));
-        messages.appendChild(document.createElement("br"));
-        messages.appendChild(document.createElement("br"));
+        messages.appendChild(message);
     }
 
     const select = document.getElementById("folder-select");
