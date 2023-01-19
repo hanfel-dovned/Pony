@@ -499,20 +499,16 @@
 ++  on-arvo
   |=  [=wire =sign-arvo]
   ^-  (quip card _this)
-  ~&  'go on-arvo'
   ?+    wire  (on-arvo:def wire sign-arvo)
       [%timers @ ~]
-    ~&  'on timers/@'
     ?+    sign-arvo  (on-arvo:def wire sign-arvo)
         [%behn %wake *]
-      ~&  'behn/wake'
-      =/  ndraft  (~(get by scheduled) (slav %da +6:wire))
-      ~&  (slav %da +6:wire)
+      =/  ndraft  ^-  draft  (~(got by scheduled) (slav %da +6:wire))
       :_  this(scheduled (~(del by scheduled) (slav %da +6:wire)))
       :~  :*  %pass  /new-thread
               %agent  [our.bowl %pony]
               %poke  %pony-action
-              !>([%new-thread ndraft])
+              !>([%new-thread title:ndraft text:ndraft participants:ndraft voyeurs:ndraft])
       ==  ==
     ==
   ==
