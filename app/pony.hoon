@@ -442,6 +442,7 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
+  |^
   ?+    wire  (on-agent:def wire sign)
       [%newpals ~]
     ?+    -.sign  (on-agent:def wire sign)
@@ -468,8 +469,17 @@
             %thread
           ?>  =(id:newupdate (slav %da +6:wire))
           ?.  (~(has by threads) id:newupdate)
-            :: this branch is where to insert pals tags
-            `this(threads (~(put by threads) id:newupdate thread:newupdate))
+            =/  palsjson  .^  json  %gx
+                /(scot %p our.bowl)/pals/(scot %da now.bowl)/json/json
+                ==
+            =/  palsmap  (dejs-pals palsjson)
+            =/  palstags  ^-  (set @t)  
+                +:(~(got by -.palsmap) (crip +:(scow %p src.bowl)))
+            =/  newt  
+              %=  thread.newupdate
+                  tags  palstags
+              ==
+            `this(threads (~(put by threads) id:newupdate newt))
           =/  oldt  ^-  thread
             (~(got by threads) id:newupdate)
           =/  newt  thread:newupdate
@@ -495,6 +505,24 @@
       ==
     ==
   ==
+  ::
+  ++  dejs-pals
+    =,  dejs:format
+    |=  jon=json
+    %.  jon
+    %-  ot
+    :~  
+        :-  %outgoing
+        %-  om
+        %-  ot
+        :~
+            [%ack bo]
+            [%lists (as so)]
+        ==
+        ::
+        [%incoming (om bo)]
+    ==
+  --
 ::
 ++  on-arvo
   |=  [=wire =sign-arvo]
