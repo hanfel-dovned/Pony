@@ -1,25 +1,57 @@
 <head>
   <style>
+    :root {
+      --bg-color: #1c1c1c;
+      --message-column-color: #232323;
+      --message-color: #282828;
+      --text-color: #f9f9f9;
+      --secondary-text-color: #c5c5c5;
+      --button-color: #616161;
+      --button-hover-color: #4b4b4b;
+    }
+
     body { 
-      background-color: white; 
+      background-color: var(--bg-color); 
       font-family: "arial"; 
       text-align: center;
       border-radius: 5;
-      color: black;
+      color: var(--text-color);
     }
 
     .content {
       padding: 18px;
       display: none;
       overflow: hidden;
-      background-color: white;
+      background-color: var(--message-column-color);
     }
+
+    button {
+        background-color: var(--button-color);
+        color: white;
+        padding: 12px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .small-text-input {
+      width: 20%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border-radius: 5px;
+      background-color: var(--message-color);
+      border: 1px solid #5d5d5d;
+      color: var(--text-color);
+  }
 
     #threads {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        background-color: var(--message-column-color);
     }
 
     .toggle {
@@ -27,13 +59,14 @@
         align-items: center;
         padding: 10px;
         margin-bottom: 10px;
-        border: 1px solid lightgray;
+        border: 1px solid rgb(48, 48, 48);
         border-radius: 4px;
-        background-color: white;
+        background-color: var(--button-color);
         position: relative;
         width: 600px;
         flex-wrap: nowrap;
         overflow: hidden;
+        cursor: pointer;
     }
     .toggle-title {
         font-size: 16px;
@@ -50,12 +83,15 @@
         transform: translateY(-50%);
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
-        border-top: 7px solid gray;
+        border-top: 7px solid rgb(181, 181, 181);
     }
     .toggle.show::before {
         transform: translateY(-50%) rotate(180deg);
         border-top: none;
-        border-bottom: 7px solid gray;
+        border-bottom: 7px solid var(--button-color);
+    }
+    .toggle.show {
+      cursor: auto;
     }
     .toggle ul {
         display: none;
@@ -77,8 +113,18 @@
         color: #333333;
     }
     .toggle.unread .toggle-title {
-        font-weight: bold; /* make the text bold */
-        color: #333333; /* change the text color */
+        font-weight: bold;
+        color: #333333;
+    }
+
+    #messageBox {
+      background-color: var(--message-color);
+      color: var(--text-color);
+      border-radius: 5px;
+    }
+
+    a {
+      color: var(--text-color);
     }
         
   </style>
@@ -88,31 +134,30 @@
 <body>
   <main>
     <h1>Pony</h1>
-    <br>
     <button type="button" class="collapsible">New Thread</button>
     <div class="content">
         <label for="Title">Title</label>
         <br>
-        <input type="text" id="titleBox" size="50"><br><br>
+        <input type="text" class="small-text-input" id="titleBox" size="50"><br><br>
         <label for="Message">Message</label>
         <br>
         <textarea id="messageBox" rows="10" cols="50"></textarea><br><br>
         <label for="PublicParticipants">Public Participants</label>
         <br>
-        <input type="text" id="participantBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
+        <input type="text" class="small-text-input" id="participantBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
         <label for="SecretParticipants">Secret Participants</label>
         <br>
-        <input type="text" id="voyeurBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
+        <input type="text" class="small-text-input" id="voyeurBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
         <button onclick="postNewThread()">Create Thread</button>
         <button onclick="postSaveDraft()">Save Draft</button><br><br>
-        <input type="datetime-local" id="dateBox">
+        <input type="datetime-local" class="small-text-input" id="dateBox">
         <button onclick="postScheduleSend()">Schedule Thread</button>
         <br><br>
         <div id="drafts"></div>
     </div>
     <br>
-    <h3>Threads</h3>
-    <input type="text" id="searchBox" placeholder = "tag or ~sampel-palnet">
+    <h2>Threads</h2>
+    <input type="text" class="small-text-input" id="searchBox" placeholder = "tag or ~sampel-palnet">
     <button type="button" onclick="search()">Search</button>
     <br><br>
     <div id="threads"></div>

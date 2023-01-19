@@ -1,84 +1,46 @@
 <head>
   <style>
+    :root {
+      --bg-color: #1c1c1c;
+      --message-column-color: #232323;
+      --message-color: #282828;
+      --text-color: #f9f9f9;
+      --secondary-text-color: #c5c5c5;
+      --button-color: #616161;
+      --button-hover-color: #4b4b4b;
+    }
+
     body { 
-      background-color: white; 
+      background-color: var(--bg-color); 
       font-family: "arial"; 
       text-align: center;
       border-radius: 5;
-      color: black;
+      color: var(--text-color);
     }
 
-    .content {
-      padding: 18px;
-      display: none;
-      overflow: hidden;
-      background-color: white;
-    }
-
-    #threads {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .toggle {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid lightgray;
-        border-radius: 4px;
-        background-color: white;
-        position: relative;
-        width: 600px;
-        flex-wrap: nowrap;
-        overflow: hidden;
-    }
-    .toggle-title {
-        font-size: 16px;
-        padding-right: 20px;
-        width: fit-content;
-        background: none;
+    button {
+        background-color: var(--button-color);
+        color: white;
+        padding: 12px 20px;
+        margin: 8px 0;
         border: none;
+        border-radius: 4px;
+        cursor: pointer;
     }
-    .toggle::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 7px solid gray;
+
+    .small-text-input {
+      width: 20%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border-radius: 5px;
+      background-color: var(--message-color);
+      border: 1px solid #5d5d5d;
+      color: var(--text-color);
     }
-    .toggle.show::before {
-        transform: translateY(-50%) rotate(180deg);
-        border-top: none;
-        border-bottom: 7px solid gray;
-    }
-    .toggle ul {
-        display: none;
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
-    .toggle.show ul {
-        display: block;
-    }
-    .toggle ul li {
-        padding: 10px;
-    }
-    .toggle.unread {
-        background-color: #f9f9f9;
-        color: #333333;
-    }
-    .toggle.unread .toggle-title {
-        color: #333333;
-    }
-    .toggle.unread .toggle-title {
-        font-weight: bold; /* make the text bold */
-        color: #333333; /* change the text color */
+    
+    a {
+      color: var(--text-color);
     }
         
   </style>
@@ -87,7 +49,9 @@
 
 <body>
   <main>
-    <h1>threads</h1>
+    <h1>Search Results</h1>
+    <input type="text" class="small-text-input" id="searchBox" placeholder = "tag or ~sampel-palnet">
+    <button type="button" onclick="search()">Search</button><br><br>
     <div id="threads"></div>
     <script>
     
@@ -120,6 +84,12 @@ var readi = 8;
 
 var searchTerm = window.location.href.split("/")
 searchTerm = searchTerm[searchTerm.length - 1]
+
+function search() 
+{
+    var searchTerm = document.getElementById("searchBox").value;
+    window.location.href = "pony/search/" + searchTerm;
+}
 
 function renderPage(state)
 {
