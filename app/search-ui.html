@@ -85,6 +85,7 @@ var readi = 8;
 var searchTerm = window.location.href.split("/")
 searchTerm = searchTerm[searchTerm.length - 1]
 
+
 function search() 
 {
     var searchTerm = document.getElementById("searchBox").value;
@@ -94,10 +95,13 @@ function search()
 function renderPage(state)
 {
     const threads = document.getElementById("threads");
+    var mypals = state[2];
 
     var searchedState = []
     if(Array.from(searchTerm)[0] == "~")
       searchedState = state[0].filter(thread => thread[participantsi].includes(searchTerm));
+    else if(searchTerm == "pals")
+      searchedState = state[0].filter(thread => mypals.some(pal => thread[hosti].includes(pal)));
     else
       searchedState = state[0].filter(thread => thread[tagsi].includes(searchTerm));
 

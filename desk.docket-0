@@ -1,6 +1,6 @@
 :~  title+'Pony'
     info+'Long-form threaded conversations.'
-    color+0x13.c6fc
+    color+0x23.2323
     base+'pony'
     site+/apps/pony
     version+[0 1 0]

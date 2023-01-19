@@ -291,8 +291,15 @@ function postNewDraft()
 
 function postForkThread()
 {
-    post("fork-thread", [threadID, document.getElementById('participantBox').value.split(" "),
-                                    document.getElementById('voyeurBox').value.split(" "),]);
+    var participants = document.getElementById('participantBox').value.split(" ")
+      if(participants[0] == [''])
+        participants = []
+
+      var voyeurs = document.getElementById('voyeurBox').value.split(" ")
+      if(voyeurs[0] == [''])
+        voyeurs = []
+
+    post("fork-thread", [threadID, participants, voyeurs]);
 }
 
 function postAddTags()
