@@ -1,7 +1,8 @@
 <head>
   <style>
     body {
-      background-color: #e9e9e9;
+      color: #f9f9f9;
+      background-color: #1c1c1c;
       justify-content: center;
       text-align: center;
       display: flex;
@@ -14,7 +15,7 @@
       padding: 18px;
       display: none;
       overflow: hidden;
-      background-color: white;
+      background-color: #1c1c1c;
     }
 
     #new-folder-container {
@@ -41,17 +42,15 @@
       font-size: 0.9em;
       text-align: center;
       margin-bottom: 10px;
-      color: #666;
+      color: #c5c5c5;
     }
 
     #tags {
       font-size: 0.9em;
       text-align: center;
       margin-bottom: 20px;
-      color: #666;
+      color: #c5c5c5;
     }
-
-    
 
   #messages {
       display: flex;
@@ -59,7 +58,7 @@
       align-items: center;
       padding: 20px;
       flex-grow:1;
-      background-color: #f9f9f9;
+      background-color: #232323;
       border-radius: 10px;
       overflow:auto;
   }
@@ -68,9 +67,9 @@
       width: 80%;
       padding: 10px;
       margin-bottom: 20px;
-      background-color: #f7f7f7;
+      background-color: #282828;
       border-radius: 5px;
-      box-shadow: 1px 1px 3px #ccc;
+      box-shadow: 1px 1px 3px #1e1e1e;
   }
 
   .message-text {
@@ -81,13 +80,13 @@
   .message-author {
       font-weight: bold;
       font-size: 0.9em;
-      color: #3c3c3c;
+      color: #f9f9f9;
       margin-right: 10px;
   }
 
   .message-date {
       font-size: 0.8em;
-      color: #999;
+      color: #c5c5c5;
   }
 
   #messageBox {
@@ -96,13 +95,23 @@
       margin: 8px 0;
       box-sizing: border-box;
       border-radius: 5px;
-      border: 1px solid #ccc;
+      border: 1px solid #1e1e1e;
   }
 
   .send-button {
-      background-color: #4CAF50;
+      background-color: #616161;
       color: white;
-      padding: 14px 20px;
+      padding: 12px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+  }
+
+  .collapsible {
+      background-color: #616161;
+      color: white;
+      padding: 12px 20px;
       margin: 8px 0;
       border: none;
       border-radius: 4px;
@@ -110,7 +119,11 @@
   }
 
   .send-button:hover {
-      background-color: #3e8e41;
+      background-color: #4b4b4b;
+  }
+
+  .collapsible:hover {
+      background-color: #4b4b4b;
   }
 
   .small-text-input {
@@ -119,16 +132,19 @@
       margin: 8px 0;
       box-sizing: border-box;
       border-radius: 5px;
-      border: 1px solid #ccc;
+      background-color: #282828;
+      border: 1px solid #1e1e1e;
+      color: #f9f9f9;
   }
 
   #folder-select {
-      background-color: #f9f9f9;
+      background-color: #282828;
+      color: #c5c5c5;
       border-radius: 5px;
       padding: 8px;
       font-size: 0.9em;
       margin-right: 10px;
-      box-shadow: 1px 1px 3px #ccc;
+      box-shadow: 1px 1px 3px #1e1e1e;
     }
 
     #new-folder-container {
@@ -137,15 +153,32 @@
     }
 
     #new-folder-input {
-      background-color: #f9f9f9;
+      background-color: #282828;
       border-radius: 5px;
       padding: 8px;
       font-size: 0.9em;
       margin-right: 10px;
-      box-shadow: 1px 1px 3px #ccc;
+      box-shadow: 1px 1px 3px #1e1e1e;
     }
 
-    
+    #messageBox {
+      background-color: #282828;
+      color: #f9f9f9;
+    }
+
+    .x-button {
+        font-size: 0.8em;
+        padding: 2px 4px;
+        background-color: #616161;
+        color: white;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .x-button:hover {
+      background-color: #4b4b4b;
+    }
 
   </style>
   <title>Pony</title>
@@ -306,6 +339,7 @@ function renderPage(state)
     addTagsTextbox.setAttribute("id", "addTagsBox");
 
     const addTagsButton = document.createElement("button");
+    addTagsButton.classList.add("send-button");
     addTagsButton.textContent = "Add Tags";
     addTagsButton.addEventListener("click", postAddTags);
 
@@ -323,9 +357,12 @@ function renderPage(state)
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "X";
         deleteBtn.setAttribute("onClick", `postRemoveTag(${JSON.stringify(state[0][threadIndex][tagsi][i])})`);
+        deleteBtn.classList.add("x-button");
+
         tags.appendChild(document.createTextNode(" "));
         tags.appendChild(deleteBtn);
         tags.appendChild(document.createTextNode(" "));
+        tags.appendChild(document.createElement("br"));
     }
     
 
