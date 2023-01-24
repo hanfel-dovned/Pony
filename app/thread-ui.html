@@ -192,6 +192,12 @@
       color: var(--text-color);
     }
 
+    button[disabled] {
+      background-color: #cccccc;
+      color: #666;
+      cursor: not-allowed;
+    }
+
   </style>
   <title>Pony</title>
 </head>
@@ -323,6 +329,34 @@ function postMoveToFolder()
     post("move-to-folder", [threadID, selectedFolder]);
 }
 
+// From https://github.com/Native-Planet/GroundSeg
+function isPatp(p)
+{ 
+  // prefixes and suffixes into arrays
+  let pre = "dozmarbinwansamlitsighidfidlissogdirwacsabwissibrigsoldopmodfoglidhopdardorlorhodfolrintogsilmirholpaslacrovlivdalsatlibtabhanticpidtorbolfosdotlosdilforpilramtirwintadbicdifrocwidbisdasmidloprilnardapmolsanlocnovsitnidtipsicropwitnatpanminritpodmottamtolsavposnapnopsomfinfonbanmorworsipronnorbotwicsocwatdolmagpicdavbidbaltimtasmalligsivtagpadsaldivdactansidfabtarmonranniswolmispallasdismaprabtobrollatlonnodnavfignomnibpagsopralbilhaddocridmocpacravripfaltodtiltinhapmicfanpattaclabmogsimsonpinlomrictapfirhasbosbatpochactidhavsaplindibhosdabbitbarracparloddosbortochilmactomdigfilfasmithobharmighinradmashalraglagfadtopmophabnilnosmilfopfamdatnoldinhatnacrisfotribhocnimlarfitwalrapsarnalmoslandondanladdovrivbacpollaptalpitnambonrostonfodponsovnocsorlavmatmipfip"
+  let suf = "zodnecbudwessevpersutletfulpensytdurwepserwylsunrypsyxdyrnuphebpeglupdepdysputlughecryttyvsydnexlunmeplutseppesdelsulpedtemledtulmetwenbynhexfebpyldulhetmevruttylwydtepbesdexsefwycburderneppurrysrebdennutsubpetrulsynregtydsupsemwynrecmegnetsecmulnymtevwebsummutnyxrextebfushepbenmuswyxsymselrucdecwexsyrwetdylmynmesdetbetbeltuxtugmyrpelsyptermebsetdutdegtexsurfeltudnuxruxrenwytnubmedlytdusnebrumtynseglyxpunresredfunrevrefmectedrusbexlebduxrynnumpyxrygryxfeptyrtustyclegnemfermertenlusnussyltecmexpubrymtucfyllepdebbermughuttunbylsudpemdevlurdefbusbeprunmelpexdytbyttyplevmylwedducfurfexnulluclennerlexrupnedlecrydlydfenwelnydhusrelrudneshesfetdesretdunlernyrsebhulrylludremlysfynwerrycsugnysnyllyndyndemluxfedsedbecmunlyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes"
+  pre = pre.match(/.{1,3}/g)
+  suf = suf.match(/.{1,3}/g)
+
+  // patp into array
+  p = p.replace(/~/g,'').split('-')
+
+  // check every syllable
+  let checked = []
+  for (let i = 0; i < p.length; i++) {
+
+    if (p[i].length == 3) {
+      checked.push(suf.includes(p[i]))
+    } else if (p[i].length == 6) {
+      let s = p[i].match(/.{1,3}/g)
+      checked.push(pre.includes(s[0]) && (suf.includes(s[1])))
+    } else {return false}
+  }
+
+  // returns true if no falses in checked
+  return !checked.includes(false)
+}
+
 function renderPage(state)
 {
     //Title
@@ -440,6 +474,29 @@ function renderPage(state)
             newFolderContainer.style.display = "block";
         }else{
             newFolderContainer.style.display = "none";
+        }
+    });
+
+    //Gray Out Posting Buttons if @p's aren't formatted correctly
+    const participantBox = document.getElementById("participantBox");
+    const voyeurBox = document.getElementById("voyeurBox");
+
+    const forkButton = document.querySelector('button[onclick="postForkThread()"]');
+    forkButton.disabled = false;
+
+    participantBox.addEventListener("input", () => {
+        if(participantBox.value.split(" ").every(isPatp) || participantBox.value == "") {
+          forkButton.disabled = false;
+        } else {
+          forkButton.disabled = true;
+        }
+    });
+
+    voyeurBox.addEventListener("input", () => {
+        if(voyeurBox.value.split(" ").every(isPatp) || voyeurBox.value == "") {
+          forkButton.disabled = false;
+        } else {
+          forkButton.disabled = true;
         }
     });
 }
