@@ -7,7 +7,7 @@
 +$  versioned-state
   $%  state-0
   ==
-+$  state-0  [%0 =threads =drafts =scheduled =mypals]
++$  state-0  [%0 =threads =drafts =scheduled =mypals success=@t]
 +$  card  card:agent:gall
 --
 %-  agent:dbug
@@ -93,7 +93,7 @@
         (send [200 ~ [%html pony-ui]])
           ::
           [%apps %pony %state ~]
-        :_  state
+        :_  state(success '')
         (send [200 ~ [%json (enjs-state +.state)]])
           ::
           [%apps %pony @ %t ~]
@@ -116,6 +116,7 @@
             =^drafts
             =^scheduled
             =^mypals
+            success=@t
         ==
     ^-  json
     :-  %a
@@ -178,6 +179,8 @@
       %+  turn  ~(tap in mypals)
       |=  pal=@p
       [%s (scot %p pal)]
+      ::
+      [%s success]
     ==
   ::
   ++  dejs-action
@@ -217,7 +220,7 @@
             ~
             %.n
         ==
-      :_  state(threads (~(put by threads) now.bowl newt))
+      :_  state(threads (~(put by threads) now.bowl newt), success 'Created new thread.')
       =-  -.-
       %^  spin  ~(tap in (~(uni in participants:action) voyeurs:action))
           now.bowl
@@ -245,7 +248,7 @@
           tags  ~
           read  %.n
         ==
-      :_  state(threads (~(put by threads) now.bowl newt))
+      :_  state(threads (~(put by threads) now.bowl newt), success 'Forked thread.')
       =-  -.-
       %^  spin  ~(tap in (~(uni in participants:action) voyeurs:action))
           now.bowl
@@ -265,7 +268,7 @@
           (~(got by threads) id:action)
       ?.  =(host:oldt our.bowl)
         ?>  =(our.bowl src.bowl)
-        :_  state
+        :_  state(success 'Requested this thread\'s host to add participant.')
         :~  :*  %pass  /addship  %agent  
                 [host:oldt %pony]
                 %poke  %pony-action
@@ -291,7 +294,12 @@
               voyeurs:oldt
             (~(del in voyeurs:oldt) src.bowl)
         ==
-      :_  state(threads (~(put by threads) id:action newt))
+      :_  %=  state
+            threads  (~(put by threads) id:action newt)
+            success  ?:  =(src.bowl our.bowl) 
+                      'Added participant.'
+                     ''
+          ==
       :~  :*  %pass  /invites  %agent
               [ship:action %pony]
               %poke  %pony-action
@@ -321,7 +329,7 @@
         (~(got by threads) id:action)
       ?.  =(host:oldt our.bowl)
         ?>  =(our.bowl src.bowl)
-        :_  state
+        :_  state(success 'Sent message to this thread\'s host.')
         :~  :*  %pass  /post  %agent
                 [host:oldt %pony]
                 %poke  %pony-action
@@ -351,7 +359,12 @@
               voyeurs:oldt
             (~(del in voyeurs:oldt) src.bowl)
         ==
-      :_  state(threads (~(put by threads) id:action newt))
+      :_  %=  state
+            threads  (~(put by threads) id:action newt)
+            success  ?:  =(src.bowl our.bowl)
+                      'Posted message.'
+                     ''
+          ==
       :~  :*  %give  %fact  ~[/(scot %da id:action)]
               %pony-update 
               !>(`update`[%thread id:action newt(voyeurs ~)])
@@ -361,13 +374,13 @@
     ::  Save a draft.
         %new-draft
       ?>  =(src.bowl our.bowl)
-      `state(drafts (snoc drafts draft:action))
+      `state(drafts (snoc drafts draft:action), success 'Saved draft.')
     ::
     ::  Delete a draft.
         %delete-draft
       ?>  =(src.bowl our.bowl)
       =/  i  (find ~[draft:action] drafts)
-      `state(drafts (oust [+.i 1] drafts))
+      `state(drafts (oust [+.i 1] drafts), success 'Deleted draft.')
     ::
     ::  Change a thread's folder.
         %move-to-folder
@@ -379,7 +392,7 @@
         %=  oldt
           folder  folder:action
         ==
-      `state(threads (~(put by threads) id:action newt))
+      `state(threads (~(put by threads) id:action newt), success 'Moved to folder.')
     ::
     ::  Add tags to a thread.
         %add-tags
@@ -393,7 +406,7 @@
         ==
       `state(threads (~(put by threads) id:action newt))
     ::
-    ::  Remove a tag to a thread.
+    ::  Remove a tag from a thread.
         %remove-tag
       ?>  =(src.bowl our.bowl)
       =/  oldt  
@@ -408,7 +421,10 @@
     ::  Use Behn to schedule a new-thread poke.
         %schedule-send
       ?>  =(src.bowl our.bowl)
-      :_  state(scheduled (~(put by scheduled) now.bowl draft:action))
+      :_  %=  state
+            scheduled  (~(put by scheduled) now.bowl draft:action)
+            success  'Scheduled thread.'
+          ==
       :~  [%pass /timers/(scot %da now.bowl) %arvo %b %wait when:action]
       ==
     ==

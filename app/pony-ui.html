@@ -133,6 +133,12 @@
     .x-button:hover {
       background-color: var(--button-hover-color);
     }
+
+    button[disabled] {
+      background-color: #cccccc; /* Light gray */
+      color: #666; /* Dark gray */
+      cursor: not-allowed;
+    }
         
   </style>
   <title>Pony</title>
@@ -141,6 +147,7 @@
 <body>
   <main>
     <h1>Pony</h1>
+    <p id="successText"></p>
     <button type="button" class="collapsible">New Thread</button>
     <div class="content">
         <div id="drafts"></div>
@@ -301,6 +308,8 @@ for (i = 0; i < coll.length; i++) {
 
 function renderPage(state)
 {
+    document.getElementById("successText").textContent = state[3];
+
     const sortedState = state[0].reduce((acc, cur) => {
         const folder = cur[folderi];
         if (!acc[folder]) {
@@ -313,6 +322,41 @@ function renderPage(state)
     for (const folder in sortedState) {
         sortedState[folder].sort((a, b) => a[readi] - b[readi]);
     }
+
+    //Gray Out Posting Buttons if @p's aren't formatted correctly
+    const participantBox = document.getElementById("participantBox");
+    const voyeurBox = document.getElementById("voyeurBox");
+
+    const createThreadButton = document.querySelector('button[onclick="postNewThread()"]');
+    createThreadButton.disabled = false;
+    const postDraftButton = document.querySelector('button[onclick="postSaveDraft()"]');
+    postDraftButton.disabled = false;
+    const scheduleButton = document.querySelector('button[onclick="postScheduleSend()"]');
+    scheduleButton.disabled = false;
+
+    /*participantBox.addEventListener("input", () => {
+        if(/^((~[a-z]{6}-[a-z]{6}\s)*(~[a-z]{6}-[a-z]{6})?\s*)$/.test(participantBox.value)) {
+            createThreadButton.disabled = false;
+            scheduleButton.disabled = false;
+            postDraftButton.disabled = false;
+        } else {
+            createThreadButton.disabled = true;
+            scheduleButton.disabled = true;
+            postDraftButton.disabled = true;
+        }
+    });
+
+    voyeurBox.addEventListener("input", () => {
+        if(/^((~[a-z]{6}-[a-z]{6}\s)*(~[a-z]{6}-[a-z]{6})?\s*)$/.test(voyeurBox.value)) {
+            createThreadButton.disabled = false;
+            scheduleButton.disabled = false;
+            postDraftButton.disabled = false;
+        } else {
+            createThreadButton.disabled = true;
+            scheduleButton.disabled = true;
+            postDraftButton.disabled = true;
+        }
+    });*/
 
     //Threads
     const toggleContainer = document.getElementById("threads");

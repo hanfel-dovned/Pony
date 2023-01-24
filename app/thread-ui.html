@@ -199,6 +199,7 @@
 <body>
   <main>
     <div id="title"></div>
+    <p id="successText"></p>
     <div id="participants"></div>
     <div id="tags"></div>
     <div id="messages"></div>
@@ -332,6 +333,9 @@ function renderPage(state)
     const titleText = document.createElement("h2");
     titleText.textContent = state[0][threadIndex][titlei];
     title.appendChild(titleText);
+
+    //Success Text
+    document.getElementById("successText").textContent = state[3];
 
     //Participants
     const participants = document.getElementById("participants");
