@@ -3,6 +3,7 @@
 /*  pony-ui     %html  /app/pony-ui/html
 /*  thread-ui   %html  /app/thread-ui/html
 /*  search-ui    %html  /app/search-ui/html
+!:
 |%
 +$  versioned-state
   $%  state-0
@@ -219,6 +220,8 @@
             'Threads'
             ~
             %.n
+            %.n
+            %.n
         ==
       :_  state(threads (~(put by threads) now.bowl newt), success 'Created new thread.')
       =-  -.-
@@ -247,6 +250,8 @@
           folder  'Threads'
           tags  ~
           read  %.n
+          unsubbed  %.n
+          locked  %.n
         ==
       :_  state(threads (~(put by threads) now.bowl newt), success 'Forked thread.')
       =-  -.-
@@ -266,6 +271,7 @@
       =/  oldt  
           ^-  thread  
           (~(got by threads) id:action)
+      ?>  =(locked:oldt %.n)
       ?.  =(host:oldt our.bowl)
         ?>  =(our.bowl src.bowl)
         :_  state(success 'Requested this thread\'s host to add participant.')
@@ -327,6 +333,7 @@
       =/  oldt  
         ^-  thread  
         (~(got by threads) id:action)
+      ?>  =(locked:oldt %.n)
       ?.  =(host:oldt our.bowl)
         ?>  =(our.bowl src.bowl)
         :_  state(success 'Sent message to this thread\'s host.')
@@ -426,6 +433,50 @@
             success  'Scheduled thread.'
           ==
       :~  [%pass /timers/(scot %da now.bowl) %arvo %b %wait when:action]
+      ==
+    ::
+    ::  If participant: mark thread as unsubbed and tell host.
+    ::  If host: remove src.bowl as participant.
+        %unsub
+      =/  oldt  
+        ^-  thread  
+        (~(got by threads) id:action)
+      ?.  =(host:oldt our.bowl)
+        ?>  =(src.bowl our.bowl)
+        =/  newt  oldt(unsubbed %.y)
+        :_  state(threads (~(put by threads) id:action newt))
+        :~  :*  %pass  /post  %agent
+                [host:oldt %pony]
+                %poke  %pony-action
+                !>([%unsub id:action])
+            ==
+        ==
+      ?<  =(src.bowl our.bowl)
+      =/  newt  
+        ?:  (~(has in participants:oldt) src.bowl)
+          oldt(participants (~(del in participants:oldt) src.bowl))
+        ?:  (~(has in voyeurs:oldt) src.bowl)
+          oldt(voyeurs (~(del in voyeurs:oldt) src.bowl))
+        oldt
+      :_  state(threads (~(put by threads) id:action newt))
+      :~  :*  %give  %fact  ~[/(scot %da id:action)]
+              %pony-update 
+              !>(`update`[%thread id:action newt(voyeurs ~)])
+          ==
+      ==
+    ::
+    ::  If host: mark thread as locked (stop accepting messages).
+        %lock
+      =/  oldt  
+        ^-  thread  
+        (~(got by threads) id:action)
+      ?>  =(host:oldt our.bowl)
+      ?>  =(src.bowl our.bowl)
+      :_  state(threads (~(put by threads) id:action oldt(locked %.y)))
+      :~  :*  %give  %fact  ~[/(scot %da id:action)]
+              %pony-update 
+              !>(`update`[%thread id:action oldt(voyeurs ~)])
+          ==
       ==
     ==
   --

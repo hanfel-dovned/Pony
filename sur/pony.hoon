@@ -11,6 +11,8 @@
                 folder=@t
                 tags=(set @t)
                 read=?
+                unsubbed=?
+                locked=?
             == 
 +$  threads  (map =id =thread)
 +$  draft  [title=@t text=@t =participants =voyeurs]
@@ -29,6 +31,8 @@
       [%add-tags =id tags=(set @t)]
       [%remove-tag =id tag=@t]
       [%schedule-send when=@da =draft]
+      [%unsub =id]
+      [%lock =id]
   ==
 +$  update
   $%  [%thread =id =thread]
