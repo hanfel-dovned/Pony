@@ -193,6 +193,12 @@ async function getState() {
     return response.json()
 }
 
+var threadsi = 0;
+var draftsi = 1;
+var palsi = 2;
+var successi = 3;
+var myshipi = 4;
+
 var idi = 0;
 var titlei = 1;
 var hosti = 2;
@@ -336,9 +342,9 @@ function isPatp(p)
 
 function renderPage(state)
 {
-    document.getElementById("successText").textContent = state[3];
+    document.getElementById("successText").textContent = state[successi];
 
-    const sortedState = state[0].reduce((acc, cur) => {
+    const sortedState = state[threadsi].reduce((acc, cur) => {
         const folder = cur[folderi];
         if (!acc[folder]) {
             acc[folder] = [];
@@ -438,7 +444,7 @@ function renderPage(state)
     //Drafts
     const drafts = document.getElementById("drafts");
 
-    if(state[1].length > 0)
+    if(state[draftsi].length > 0)
     {
       const headerDr = document.createElement("strong");
       headerDr.textContent = "Drafts";
@@ -447,22 +453,22 @@ function renderPage(state)
       drafts.appendChild(document.createElement("br"));
 
       const newThreadButton = document.getElementById("newThreadButton");
-      if(state[1].length == 1)
-        newThreadButton.textContent = "New Thread (" + state[1].length + " Draft)";
+      if(state[draftsi].length == 1)
+        newThreadButton.textContent = "New Thread (" + state[draftsi].length + " Draft)";
       else
-        newThreadButton.textContent = "New Thread (" + state[1].length + " Drafts)";
+        newThreadButton.textContent = "New Thread (" + state[draftsi].length + " Drafts)";
     }
 
-    for(var i = 0; i < state[1].length; i++) {
+    for(var i = 0; i < state[draftsi].length; i++) {
         const draft = document.createElement("a");
-        draft.textContent = state[1][i][0];
+        draft.textContent = state[draftsi][i][0];
         draft.setAttribute('href', "javascript:void(0)");
         drafts.appendChild(draft);
 
         // create a delete button
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "x";
-        deleteBtn.setAttribute("onClick", `postDeleteDraft(${JSON.stringify(state[1][i])})`);
+        deleteBtn.setAttribute("onClick", `postDeleteDraft(${JSON.stringify(state[draftsi][i])})`);
         deleteBtn.classList.add("x-button");
         drafts.appendChild(document.createTextNode(" ")); // add a space
         drafts.appendChild(deleteBtn);
@@ -473,15 +479,15 @@ function renderPage(state)
         //as it is when this function was defined
         draft.addEventListener("click", (function(index){
               return function(){
-                  document.getElementById("titleBox").value = state[1][index][0];
-                  document.getElementById("messageBox").innerHTML = state[1][index][1];
-                  document.getElementById("participantBox").value = state[1][index][2];
-                  document.getElementById("voyeurBox").value = state[1][index][3];
+                  document.getElementById("titleBox").value = state[draftsi][index][0];
+                  document.getElementById("messageBox").innerHTML = state[draftsi][index][1];
+                  document.getElementById("participantBox").value = state[draftsi][index][2];
+                  document.getElementById("voyeurBox").value = state[draftsi][index][3];
               }
           })(i));
         }
 
-        if(state[1].length > 0)
+        if(state[draftsi].length > 0)
         {
           drafts.appendChild(document.createElement("br"));
           drafts.appendChild(document.createElement("br"));

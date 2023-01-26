@@ -157,6 +157,8 @@
           |=  tag=@t  [%s tag]
           ::
           [%b read:thread]
+          [%b unsubbed:thread]
+          [%b locked:thread]
       ==
       ::
       :-  %a
@@ -182,6 +184,8 @@
       [%s (scot %p pal)]
       ::
       [%s success]
+      ::
+      [%s (scot %p our.bowl)]
     ==
   ::
   ++  dejs-action
@@ -200,6 +204,8 @@
         [%add-tags (at ~[(se %da) (as so)])]
         [%remove-tag (at ~[(se %da) so])]
         [%schedule-send (at ~[(se %da) so so (as (se %p)) (as (se %p))])]
+        [%lock (se %da)]
+        [%unsub (se %da)]
     ==
   ::
   ++  handle-action
@@ -450,6 +456,10 @@
                 %poke  %pony-action
                 !>([%unsub id:action])
             ==
+            :*  %pass  /updates/(scot %da id:action)
+                %agent  [src.bowl %pony]
+                %leave  ~
+            ==
         ==
       ?<  =(src.bowl our.bowl)
       =/  newt  
@@ -536,16 +546,16 @@
             %thread
           ?>  =(id:newupdate (slav %da +6:wire))
           ?.  (~(has by threads) id:newupdate)
-            =/  palsjson  .^  json  %gx
-                /(scot %p our.bowl)/pals/(scot %da now.bowl)/json/json
-                ==
-            =/  palsmap  (dejs-pals palsjson)
-            =/  palstags  ^-  (set @t)  
-                +:(~(got by -.palsmap) (crip +:(scow %p src.bowl)))
-            =/  newt  
-              %=  thread.newupdate
-                  tags  palstags
-              ==
+         ::   =/  palsjson  .^  json  %gx
+         ::       /(scot %p our.bowl)/pals/(scot %da now.bowl)/json/json
+         ::       ==
+         ::   =/  palsmap  (dejs-pals palsjson)
+         ::   =/  palstags  ^-  (set @t)  
+         ::       +:(~(got by -.palsmap) (crip +:(scow %p src.bowl)))
+            =/  newt  thread.newupdate
+         ::     %=  thread.newupdate
+         ::         tags  palstags
+         ::     ==
             `this(threads (~(put by threads) id:newupdate newt))
           =/  oldt  ^-  thread
             (~(got by threads) id:newupdate)
@@ -555,6 +565,7 @@
               folder  folder:oldt
               tags  tags:oldt
               read  %.n
+              unsubbed  unsubbed:oldt
             ==
           `this(threads (~(put by threads) id:newupdate newt))
         ==

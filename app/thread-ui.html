@@ -209,10 +209,12 @@
     <div id="participants"></div>
     <div id="tags"></div>
     <div id="messages"></div>
-    <textarea id="messageBox" rows="10" cols="100"></textarea><br><br>
-    <button class="send-button" onclick="postNewMessage()">Post</button><br><br><br>
-    <input type="text" class="small-text-input" id="addShipBox" placeholder="~sampel-palnet">
-    <button class="send-button" onclick="postAddShip()">Invite Ship to Thread</button><br><br><br>
+    <div id="postingTools">
+      <textarea id="messageBox" rows="10" cols="100"></textarea><br><br>
+      <button id="postButton" class="send-button" onclick="postNewMessage()">Post</button><br><br><br>
+      <input id="addParticipantBox" type="text" class="small-text-input" id="addShipBox" placeholder="~sampel-palnet">
+      <button id="addShipButton" class="send-button" onclick="postAddShip()">Invite Ship to Thread</button><br><br><br>
+    </div>
     <div>
       <select id="folder-select">
         <option id="new-folder-option" value="new">New Folder</option>
@@ -232,6 +234,8 @@
         <input type="text" class="small-text-input" id="voyeurBox" size="50" placeholder="~sampel-palnet ~palnet-sampel"><br><br>
         <button class="send-button" onclick="postForkThread()">Fork</button>
     </div>
+    <button id="lockButton" class="send-button" onclick="postLock()">Lock Thread</button>
+    <button id="unsubButton" class="send-button" onclick="postUnsub()">Leave Thread</button>
     <script>
     
 
@@ -246,6 +250,13 @@ function post(tag, data) {
 getState()
     .then((state) => renderPage(state))
 
+
+var threadsi = 0;
+var draftsi = 1;
+var palsi = 2;
+var successi = 3;
+var myshipi = 4;
+
 var idi = 0;
 var titlei = 1;
 var hosti = 2;
@@ -255,6 +266,8 @@ var voyeursi = 5;
 var folderi = 6;
 var tagsi = 7;
 var readi = 8;
+var unsubbedi = 9;
+var lockedi = 10;
 
 
 async function getState() {
@@ -317,6 +330,16 @@ function postAddTags()
 function postRemoveTag(tag)
 {
     post("remove-tag", [threadID, tag]);
+}
+
+function postLock()
+{
+    post("lock", threadID);
+}
+
+function postUnsub()
+{
+    post("unsub", threadID);
 }
 
 function postMoveToFolder()
@@ -499,6 +522,20 @@ function renderPage(state)
           forkButton.disabled = true;
         }
     });
+
+    //If thread is locked or unsubbed, remove posting tools
+    if(state[0][threadIndex][unsubbedi] == 1 || state[0][threadIndex][lockedi] == 1)
+    {
+      document.getElementById("postingTools").remove();
+      document.getElementById("lockButton").remove();
+      document.getElementById("unsubButton").remove();
+    }
+
+    //Only the host can lock, only non-hosts can unsubscribe
+    if(state[myshipi] == state[threadsi][threadIndex][hosti])
+      document.getElementById("unsubButton").remove();
+    else
+      document.getElementById("lockButton").remove();
 }
 
 </script>
