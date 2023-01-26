@@ -100,8 +100,10 @@ function renderPage(state)
     var searchedState = []
     if(Array.from(searchTerm)[0] == "~")
       searchedState = state[0].filter(thread => thread[participantsi].includes(searchTerm));
-    else if(searchTerm == "pals")
+    else if(searchTerm == "pals-host")
       searchedState = state[0].filter(thread => mypals.some(pal => thread[hosti].includes(pal)));
+    else if(searchTerm == "pals")
+      searchedState = state[0].filter(thread => mypals.some(pal => thread[participantsi].includes(pal)));
     else
       searchedState = state[0].filter(thread => thread[tagsi].includes(searchTerm));
 

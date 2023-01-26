@@ -148,7 +148,7 @@
   <main>
     <h1>Pony</h1>
     <p id="successText"></p>
-    <button type="button" class="collapsible">New Thread</button>
+    <button type="button" class="collapsible" id="newThreadButton">New Thread</button>
     <div class="content">
         <div id="drafts"></div>
         <label for="Title">Title</label>
@@ -170,7 +170,7 @@
         <br><br>
     </div>
     <br>
-    <input type="text" class="small-text-input" id="searchBox" placeholder = 'tag or ~sampel-palnet or "pals"'>
+    <input type="text" class="small-text-input" id="searchBox" placeholder = 'tag or ~sampel-palnet or "pals" or "pals-host"'>
     <button type="button" onclick="search()">Search</button>
     <br><br>
     <div id="threads"></div>
@@ -445,6 +445,12 @@ function renderPage(state)
       drafts.appendChild(headerDr);
       drafts.appendChild(document.createElement("br"));
       drafts.appendChild(document.createElement("br"));
+
+      const newThreadButton = document.getElementById("newThreadButton");
+      if(state[1].length == 1)
+        newThreadButton.textContent = "New Thread (" + state[1].length + " Draft)";
+      else
+        newThreadButton.textContent = "New Thread (" + state[1].length + " Drafts)";
     }
 
     for(var i = 0; i < state[1].length; i++) {
