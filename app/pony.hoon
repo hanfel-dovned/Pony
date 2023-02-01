@@ -546,17 +546,20 @@
             %thread
           ?>  =(id:newupdate (slav %da +6:wire))
           ?.  (~(has by threads) id:newupdate)
-         ::   =/  palsjson  .^  json  %gx
-         ::       /(scot %p our.bowl)/pals/(scot %da now.bowl)/json/json
-         ::       ==
-         ::   =/  palsmap  (dejs-pals palsjson)
-         ::   =/  palstags  ^-  (set @t)  
-         ::       +:(~(got by -.palsmap) (crip +:(scow %p src.bowl)))
-            =/  newt  thread.newupdate
-         ::     %=  thread.newupdate
-         ::         tags  palstags
-         ::     ==
+            =/  palstags  ^-  (set @t)
+              ?.  .^(? %gu /(scot %p our.bowl)/pals/(scot %da now.bowl))
+                ~
+              =/  palsjson  .^  json  %gx
+                  /(scot %p our.bowl)/pals/(scot %da now.bowl)/json/json
+                  ==
+              =/  palsmap  (dejs-pals palsjson)
+              +:(~(got by -.palsmap) (crip +:(scow %p src.bowl)))
+            =/  newt
+              %=  thread.newupdate
+                  tags  palstags
+              ==
             `this(threads (~(put by threads) id:newupdate newt))
+            ::
           =/  oldt  ^-  thread
             (~(got by threads) id:newupdate)
           =/  newt  thread:newupdate
