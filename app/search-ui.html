@@ -50,7 +50,7 @@
 <body>
   <main>
     <h1>Search Results</h1>
-    <input type="text" class="small-text-input" id="searchBox" placeholder = "tag or ~sampel-palnet">
+    <input type="text" class="small-text-input" id="searchBox" placeholder = 'tag or ~sampel-palnet or "pals" or "pals-host"'>
     <button type="button" onclick="search()">Search</button><br><br>
     <div id="threads"></div>
     <script>
@@ -95,7 +95,9 @@ searchTerm = searchTerm[searchTerm.length - 1]
 function search() 
 {
     var searchTerm = document.getElementById("searchBox").value;
-    window.location.href = "pony/search/" + searchTerm;
+    var currentPath = window.location.pathname;
+    var basePath = currentPath.substring(0, currentPath.lastIndexOf("/") + 1);
+    window.location.href = basePath + searchTerm;
 }
 
 function renderPage(state)
