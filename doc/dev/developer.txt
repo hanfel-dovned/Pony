@@ -1,0 +1,1 @@
+See sur/pony.hoon for a list of pokes. Recommended usage is for other apps to write new drafts to Pony with the %new-draft poke, so that the user can confirm actions on them later. You probably shouldn't do anything more than that.
