@@ -1,11 +1,21 @@
 Pony is an Urbit app suited for long-form conversations, like a blend between email and a message board.
+
 A thread is a series of posts. You can make a thread and invite other people to it to post with you.
+
 Public Participants are visible to all thread participants. Secret Participants are only visible to the thread host (aka, the person who created the thread). Think of it like bcc.
+
 Instead of posting a thread immediately, you can schedule it to be posted in the future.
+
 When you join or post a new thread, it'll go to the default folder called "Threads". You can move a thread to a new folder at the bottom of that thread's page.
+
 Also at the bottom of each thread's page is the "Fork Thread" button. This allows you to duplicate the thread's current posts and continue the conversation with a different set of participants.
+
 Participants can leave a thread with the Leave Thread button. This unsubscribes you from the thread and removes your ability to post in it. You'll still be able to see posts up to the point you left.
+
 Hosts can lock a thread with the Lock Thread button. This removes all participants' ability to post or add new participants.
+
 You can add tags to a thread too. These are stored locally; no one else will see your tags.
+
 If one of your %pals invites you to a thread, your %pals tags for them will automatically be added to your tags for that thread.
+
 On the main page, you can search for threads by tag or participant. You can also search the keyword "pals" for a list of threads that your pals are participating in and "pals-host" for a list of threads that your pals are hosting.

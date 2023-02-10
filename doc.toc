@@ -1,4 +1,4 @@
-/dev                  Developer
-  /dev/txt            Pokes
-/usr		              User
-  /user/txt           How to Use Pony
+/dev           Developer
+  /developer/txt     Pokes
+/usr           User
+  /user/txt    How to Use Pony
