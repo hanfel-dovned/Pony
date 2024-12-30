@@ -1,4 +1,4 @@
-Implementation of [%pony Urbit grant](https://web.archive.org/web/20230915091147/https://urbit.org/grants/pony-bounty):
+Completion of [%pony Urbit grant](https://web.archive.org/web/20230915091147/https://urbit.org/grants/pony-bounty):
 
 # %pony: Urbit-native long-form mail
 
